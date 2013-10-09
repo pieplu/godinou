@@ -255,18 +255,31 @@ SQL>
 SQL> -- 14.  Le montant total commandé pour chaque paire (dateCommande, noArticle) dans les cas où le montant total dépasse 50$.
 SQL> 
 
-SELECT distinct dateCommande, noArticle, (quantite*prixUnitaire)as MONTANTOTALCOMMANDE
+
+
+select t1.datecommande, t1.noArticle, SUM(t1.MONTANTOTALCOMMANDE) as MONTANTOTALCOMMANDE
+FROM
+(SELECT 
+dateCommande, 
+noArticle, 
+(quantite * prixUnitaire) as MONTANTOTALCOMMANDE
 FROM Commande
 natural join LigneCommande
 natural join Article
-where (quantite*prixUnitaire)>50;
+where (quantite*prixUnitaire)>50) t1
+group by t1.noArticle, t1.datecommande;
 
 
-SELECT dateCommande, noArticle, quantite, noCommande, prixUnitaire
+
+
+select distinct datecommande, noarticle, (sum(quantite*prixunitaire) as MONTANTOTALCOMMANDE
 FROM Commande
 natural join LigneCommande
-natural join Article
-where (quantite*prixUnitaire)>50;
+natural join Article;
+
+
+
+
 
 
 
@@ -288,10 +301,34 @@ SQL> -- 15.  Les noArticle des articles commandés dans toutes et chacune des co
 SQL> 
 SQL> 
 
-
-select noArticle
+SELECT distinct noArticle
+FROM
+(SELECT Distinct noCommande, noArticle
 from Commande natural join LigneCommande
-where noClient = 20;
+where noclient=20) 
+natural join
+(SELECT Distinct noCommande, noArticle
+from Commande natural join LigneCommande
+where noclient=20);
+
+
+diapo chap4
+
+
+SELECT noArticle
+FROM Article
+WHERE NOT EXISTS
+    	(SELECT noCommande
+      FROM Commande
+ 	 WHERE noClient = 20 AND NOT EXISTS
+     		(SELECT *
+      	 FROM LigneCommande
+      	 WHERE noArticle = Article.noArticle AND
+				noCommande = Commande.noCommande));
+
+
+
+
 
 
  NOARTICLE                                                                      
