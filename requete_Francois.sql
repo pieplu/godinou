@@ -157,15 +157,6 @@ SQL> -- 9.   Le noLivraison, noCommande, noArticle, la date de la commande, la q
 SQL> 
 SQL> 
 
-SELECT Distinct DL.noLivraison, LC.noCommande, LC.noArticle, C.dateCommande, LC.quantite, L.dateLivraison, DL.quantiteLivree, (L.dateLivraison-C.dateCommande) as NBJOURSECOULES
-FROM DetailLivraison DL,Commande C, LigneCommande LC,Livraison L
-WHERE C.noCommande=LC.noCommande 
-AND LC.noCommande=DL.noCommande 
-AND DL.noLivraison=L.noLivraison 
-AND (L.dateLivraison-C.dateCommande > 2) 
-AND (((SELECT SYSDATE FROM dual)-C.dateCommande)>100);
-
-
 
 SELECT Distinct noLivraison, noCommande, noArticle, dateCommande, quantite, dateLivraison, quantiteLivree, (dateLivraison-dateCommande) as NBJOURSECOULES
 FROM Commande
@@ -272,28 +263,6 @@ group by t1.noArticle, t1.datecommande;
 
 
 
-select distinct datecommande, noarticle, (sum(quantite*prixunitaire) as MONTANTOTALCOMMANDE
-FROM Commande
-natural join LigneCommande
-natural join Article;
-
-
-
-
-
-
-
-
-
-DATECOMMAN  NOARTICLE MONTANT TOTAL COMMANDÉ                                    
----------- ---------- ----------------------                                    
-09/07/2000         10                  109,9                                    
-01/06/2000         70                  54,95                                    
-02/06/2000         40                  51,98                                    
-01/06/2000         10                  109,9                                    
-09/07/2000         20                  64,95                                    
-
-
 
 
 SQL> 
@@ -301,18 +270,6 @@ SQL> -- 15.  Les noArticle des articles commandés dans toutes et chacune des co
 SQL> 
 SQL> 
 
-SELECT distinct noArticle
-FROM
-(SELECT Distinct noCommande, noArticle
-from Commande natural join LigneCommande
-where noclient=20) 
-natural join
-(SELECT Distinct noCommande, noArticle
-from Commande natural join LigneCommande
-where noclient=20);
-
-
-diapo chap4
 
 
 SELECT noArticle
@@ -327,12 +284,5 @@ WHERE NOT EXISTS
 				noCommande = Commande.noCommande));
 
 
-
-
-
-
- NOARTICLE                                                                      
-----------                                                                      
-        40                                                                      
-                        
+       
 
