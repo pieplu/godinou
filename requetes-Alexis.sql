@@ -11,9 +11,149 @@ SELECT noArticle, Description FROM Article WHERE (description LIKE '%bl%') OR (d
 SELECT noClient, nomclient FROM Client NATURAL JOIN Commande WHERE datecommande = '9/07/2000'; 
 
 
---pas fait
-SELECT nomClient, nocommande, datecommande, noArticle FROM Client, commande, lignecommande, DetailLivraison, Livraison WHERE dateLi
+
+-- 5.   Les noms des clients, numéros de commande, date de commande et noArticle pour les articles livrés le 4 juin 2000 dont la quantité livrée est supérieure à 1
+
+SELECT nomClient, nocommande, datecommande, noArticle 
+FROM Client NATURAL JOIN commande NATURAL JOIN lignecommande NATURAL JOIN DetailLivraison NATURAL JOIN Livraison 
+WHERE dateLivraison='04/06/2000' AND quantiteLivree > 1;                      
 
 
---13
-SELECT Distinct commande.nocommande as nocommande1, copy.nocommande as nocommande2, copy.datecommande FROM commande, commande copy WHERE commande.datecommande = copy.datecommande AND commande.nocommande != copy.nocommande;
+-- 6.   La liste des dates du mois de juin 2000 pour lesquelles il y a au moins une livraison ou une commande. Les résultats sont produits en une colonne nommée DateÉvénement.
+
+SELECT DISTINCT *
+FROM
+	(SELECT datecommande AS DateEvenement
+	FROM Commande
+	WHERE datecommande LIKE '%06/2000%')
+	union
+	(SELECT datelivraison AS DateEvenement
+	FROM Livraison
+	WHERE datelivraison LIKE '%06/2000%');                                                                  
+
+
+-- 7.   Les noArticle et la quantité totale livrée de l’article incluant les articles dont la quantité totale livrée est égale à 0.
+
+SELECT noArticle, SUM(COALESCE(quantiteLivree,0)) AS QUANTITELIVREE
+FROM DetailLivraison NATURAL RIGHT OUTER JOIN Article
+GROUP BY noArticle;
+
+
+ NOARTICLE QUANTITÉ LIVRÉE                                                      
+---------- ---------------                                                      
+        10              10                                                      
+        20               1                                                      
+        40               3                                                      
+        50               0                                                      
+        60               0                                                      
+        70               7                                                      
+        80               0                                                      
+        81               0                                                      
+        90               1                                                      
+        95               1                                                      
+
+10 ligne(s) sélectionnée(s).
+
+-- 8.   Les noArticle et la quantité totale livrée de l’article pour les articles dont le prix est inférieur à $20 et dont la quantité totale livrée est inférieure à 5
+
+Requête SQL …
+
+ NOARTICLE QUANTITÉ LIVRÉE                                                      
+---------- ---------------                                                      
+        20               1                                                      
+        60               0                                                      
+        95               1                                                      
+-- 9.   Le noLivraison, noCommande, noArticle, la date de la commande, la quantité commandée, la date de la livraison, la quantitée livrée et le nombre de jours écoulés entre la commande et la livraison dans le cas où ce nombre a dépassé 2 jours et le nombre de jours écoulés depuis la commande jusqu’à aujourh’hui est supérieur à 100
+
+Requête SQL …
+
+NOLIVRAISON NOCOMMANDE  NOARTICLE DATECOMMAN   QUANTITÉ DATELIVRAI              
+----------- ---------- ---------- ---------- ---------- ----------              
+QUANTITÉLIVRÉE NOMBRE JOURS ÉCOULÉS                                             
+-------------- --------------------                                             
+        101          1         10 01/06/2000         10 04/06/2000              
+             3                    3                                             
+                                                                                
+        103          1         90 01/06/2000          1 05/06/2000              
+             1                    4                                             
+                                                                                
+
+
+-- 10.  La liste des Articles triée en ordre décroissant de prix et pour chacun des prix en ordre croissant de numéro
+
+Requête SQL …
+
+ NOARTICLE DESCRIPTION          PRIXUNITAIRE QUANTITÉENSTOCK                    
+---------- -------------------- ------------ ---------------                    
+        80 Poirier                     26,99              10                    
+        40 Épinette bleue              25,99              10                    
+        81 Catalpa                     25,99              10                    
+        90 Pommier                     25,99              10                    
+        50 Chêne                       22,99              10                    
+        60 Érable argenté              15,99              10                    
+        95 Génévrier                   15,99              10                    
+        20 Sapin                       12,99              10                    
+        10 Cèdre en boule              10,99              10                    
+        70 Herbe à puce                10,99              10                    
+
+10 ligne(s) sélectionnée(s).
+
+
+-- 11.  Le nombre d’articles dont le prix est supérieur à 25 et le nombre d'articles dont le prix est inférieur à 15 (en deux colonnes)
+
+Requête SQL …
+
+NOMBREPLUSCHERQUE25 NOMBREMOINSCHERQUE15                                        
+------------------- --------------------                                        
+                  4                    3                                        
+
+
+-- 12.  Les noCommande des commandes qui n'ont aucune livraison correspondante
+Requête SQL …
+
+NOCOMMANDE                                                                      
+----------                                                                      
+         8                                                                      
+         6                                                                      
+         7                                                                      
+
+
+-- 13.  En deux colonnes, les paires de numéros de commandes (différentes) qui sont faites à la même date ainsi que la date de commande. Il faut éviter de répéter deux fois la même paire.
+
+Requête SQL …
+
+NOCOMMANDE NOCOMMANDE DATECOMMAN                                                
+---------- ---------- ----------                                                
+         2          3 02/06/2000                                                
+         5          6 09/07/2000                                                
+         7          8 15/07/2000                                                
+
+
+
+
+
+
+
+-- 14.  Le montant total commandé pour chaque paire (dateCommande, noArticle) dans les cas où le montant total dépasse 50$.
+Requête SQL …
+
+DATECOMMAN  NOARTICLE MONTANT TOTAL COMMANDÉ                                    
+---------- ---------- ----------------------                                    
+09/07/2000         10                  109,9                                    
+01/06/2000         70                  54,95                                    
+02/06/2000         40                  51,98                                    
+01/06/2000         10                  109,9                                    
+09/07/2000         20                  64,95                                    
+
+
+-- 15.  Les noArticle des articles commandés dans toutes et chacune des commandes du client 20
+
+Requête SQL …
+
+ NOARTICLE                                                                      
+----------                                                                      
+        40                                                                      
+
+
+
+NB Pour la dernière requête, le même article soit être commandé dans toutes les commandes du client 20.
