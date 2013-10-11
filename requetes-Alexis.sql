@@ -53,7 +53,10 @@ ORDER BY noArticle;
                                                     
 -- 9.   Le noLivraison, noCommande, noArticle, la date de la commande, la quantité commandée, la date de la livraison, la quantitée livrée et le nombre de jours écoulés entre la commande et la livraison dans le cas où ce nombre a dépassé 2 jours et le nombre de jours écoulés depuis la commande jusqu’à aujourh’hui est supérieur à 100
 
-Requête SQL …
+
+SELECT noLivraison, nocommande, noArticle, datecommande, quantite, datelivraison, quantiteLivree, (datelivraison-dateCommande) AS nombreJourEcoule
+FROM Livraison NATURAL JOIN DetailLivraison NATURAL JOIN lignecommande NATURAL JOIN Commande
+WHERE (datelivraison-dateCommande > 2) AND (SYSDATE-datecommande>100);
 
 NOLIVRAISON NOCOMMANDE  NOARTICLE DATECOMMAN   QUANTITÉ DATELIVRAI  QUANTITÉLIVRÉE NOMBRE JOURS ÉCOULÉS 
 ----------- ---------- ---------- ---------- ---------- ----------  -------------- -------------------- 
