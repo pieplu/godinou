@@ -1,4 +1,4 @@
 godinTp1
 ========
 
-Tp1 sql de mister Godin
+Tp1 sql, Robert Godin
