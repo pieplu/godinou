@@ -58,32 +58,11 @@ SELECT noLivraison, nocommande, noArticle, datecommande, quantite, datelivraison
 FROM Livraison NATURAL JOIN DetailLivraison NATURAL JOIN lignecommande NATURAL JOIN Commande
 WHERE (datelivraison-dateCommande > 2) AND (SYSDATE-datecommande>100);
 
-NOLIVRAISON NOCOMMANDE  NOARTICLE DATECOMMAN   QUANTITÉ DATELIVRAI  QUANTITÉLIVRÉE NOMBRE JOURS ÉCOULÉS 
------------ ---------- ---------- ---------- ---------- ----------  -------------- -------------------- 
-        101          1         10 01/06/2000         10 04/06/2000               3                    3                  
-        103          1         90 01/06/2000          1 05/06/2000               1                    4            
-                                             
-                                                                                
-
-
 -- 10.  La liste des Articles triée en ordre décroissant de prix et pour chacun des prix en ordre croissant de numéro
 
-Requête SQL …
-
- NOARTICLE DESCRIPTION          PRIXUNITAIRE QUANTITÉENSTOCK                    
----------- -------------------- ------------ ---------------                    
-        80 Poirier                     26,99              10                    
-        40 Épinette bleue              25,99              10                    
-        81 Catalpa                     25,99              10                    
-        90 Pommier                     25,99              10                    
-        50 Chêne                       22,99              10                    
-        60 Érable argenté              15,99              10                    
-        95 Génévrier                   15,99              10                    
-        20 Sapin                       12,99              10                    
-        10 Cèdre en boule              10,99              10                    
-        70 Herbe à puce                10,99              10                    
-
-10 ligne(s) sélectionnée(s).
+SELECT noArticle, description, prixUnitaire, QuantiteEnStock
+FROM article
+ORDER BY prixUnitaire DESC, noArticle ASC;
 
 
 -- 11.  Le nombre d’articles dont le prix est supérieur à 25 et le nombre d'articles dont le prix est inférieur à 15 (en deux colonnes)
