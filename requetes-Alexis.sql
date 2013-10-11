@@ -39,43 +39,27 @@ FROM DetailLivraison NATURAL RIGHT OUTER JOIN Article
 GROUP BY noArticle;
 
 
- NOARTICLE QUANTITÉ LIVRÉE                                                      
----------- ---------------                                                      
-        10              10                                                      
-        20               1                                                      
-        40               3                                                      
-        50               0                                                      
-        60               0                                                      
-        70               7                                                      
-        80               0                                                      
-        81               0                                                      
-        90               1                                                      
-        95               1                                                      
-
-10 ligne(s) sélectionnée(s).
-
 -- 8.   Les noArticle et la quantité totale livrée de l’article pour les articles dont le prix est inférieur à $20 et dont la quantité totale livrée est inférieure à 5
 
-Requête SQL …
+SELECT noArticle, QUANTITELIVREE
+FROM (SELECT noArticle, QUANTITELIVREE
+FROM (SELECT noArticle, SUM(COALESCE(quantiteLivree,0)) AS QUANTITELIVREE
+FROM DetailLivraison NATURAL RIGHT OUTER JOIN Article
+GROUP BY noArticle)
+WHERE QUANTITELIVREE<5) NATURAL JOIN Article
+WHERE prixUnitaire<20
+ORDER BY noArticle;
 
- NOARTICLE QUANTITÉ LIVRÉE                                                      
----------- ---------------                                                      
-        20               1                                                      
-        60               0                                                      
-        95               1                                                      
+                                                    
 -- 9.   Le noLivraison, noCommande, noArticle, la date de la commande, la quantité commandée, la date de la livraison, la quantitée livrée et le nombre de jours écoulés entre la commande et la livraison dans le cas où ce nombre a dépassé 2 jours et le nombre de jours écoulés depuis la commande jusqu’à aujourh’hui est supérieur à 100
 
 Requête SQL …
 
-NOLIVRAISON NOCOMMANDE  NOARTICLE DATECOMMAN   QUANTITÉ DATELIVRAI              
------------ ---------- ---------- ---------- ---------- ----------              
-QUANTITÉLIVRÉE NOMBRE JOURS ÉCOULÉS                                             
--------------- --------------------                                             
-        101          1         10 01/06/2000         10 04/06/2000              
-             3                    3                                             
-                                                                                
-        103          1         90 01/06/2000          1 05/06/2000              
-             1                    4                                             
+NOLIVRAISON NOCOMMANDE  NOARTICLE DATECOMMAN   QUANTITÉ DATELIVRAI  QUANTITÉLIVRÉE NOMBRE JOURS ÉCOULÉS 
+----------- ---------- ---------- ---------- ---------- ----------  -------------- -------------------- 
+        101          1         10 01/06/2000         10 04/06/2000               3                    3                  
+        103          1         90 01/06/2000          1 05/06/2000               1                    4            
+                                             
                                                                                 
 
 
