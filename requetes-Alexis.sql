@@ -34,14 +34,14 @@ FROM
 
 -- 7.   Les noArticle et la quantité totale livrée de l’article incluant les articles dont la quantité totale livrée est égale à 0.
 
-SELECT noArticle, SUM(COALESCE(quantiteLivree,0)) AS QUANTITELIVREE
+SELECT noArticle, SUM(COALESCE(quantiteLivree,0)) AS "QUANTITE LIVREE"
 FROM DetailLivraison NATURAL RIGHT OUTER JOIN Article
 GROUP BY noArticle;
 
 
 -- 8.   Les noArticle et la quantité totale livrée de l’article pour les articles dont le prix est inférieur à $20 et dont la quantité totale livrée est inférieure à 5
 
-SELECT noArticle, QUANTITELIVREE
+SELECT noArticle, QUANTITELIVREE AS "QUANTITE LIVREE"
 FROM (SELECT noArticle, QUANTITELIVREE
 FROM (SELECT noArticle, SUM(COALESCE(quantiteLivree,0)) AS QUANTITELIVREE
 FROM DetailLivraison NATURAL RIGHT OUTER JOIN Article
@@ -54,7 +54,7 @@ ORDER BY noArticle;
 -- 9.   Le noLivraison, noCommande, noArticle, la date de la commande, la quantité commandée, la date de la livraison, la quantitée livrée et le nombre de jours écoulés entre la commande et la livraison dans le cas où ce nombre a dépassé 2 jours et le nombre de jours écoulés depuis la commande jusqu’à aujourh’hui est supérieur à 100
 
 
-SELECT noLivraison, nocommande, noArticle, datecommande, quantite, datelivraison, quantiteLivree, (datelivraison-dateCommande) AS nombreJourEcoule
+SELECT noLivraison, nocommande, noArticle, datecommande, quantite, datelivraison, quantiteLivree, (datelivraison-dateCommande) AS "NOMBRE JOURS ECOULES"
 FROM Livraison NATURAL JOIN DetailLivraison NATURAL JOIN lignecommande NATURAL JOIN Commande
 WHERE (datelivraison-dateCommande > 2) AND (SYSDATE-datecommande>100);
 
