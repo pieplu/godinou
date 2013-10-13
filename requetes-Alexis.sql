@@ -78,7 +78,10 @@ FROM (SELECT Count(prixUnitaire) AS "NOMBREPLUSCHERQUE25"
 
 
 -- 12.  Les noCommande des commandes qui n'ont aucune livraison correspondante
-Requête SQL …
+SELECT noCommande
+FROM NOT EXIST 
+
+);
 
 NOCOMMANDE                                                                      
 ----------                                                                      
