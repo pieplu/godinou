@@ -67,11 +67,14 @@ ORDER BY prixUnitaire DESC, noArticle ASC;
 
 -- 11.  Le nombre d’articles dont le prix est supérieur à 25 et le nombre d'articles dont le prix est inférieur à 15 (en deux colonnes)
 
-Requête SQL …
-
-NOMBREPLUSCHERQUE25 NOMBREMOINSCHERQUE15                                        
-------------------- --------------------                                        
-                  4                    3                                        
+SELECT *
+FROM (SELECT Count(prixUnitaire) AS "NOMBREPLUSCHERQUE25"
+    FROM Article
+    WHERE prixUnitaire>25 
+    ),( SELECT Count(prixUnitaire) AS "NOMBREMOINSCHERQUE15"
+    FROM Article
+    WHERE prixUnitaire<15 );
+                                    
 
 
 -- 12.  Les noCommande des commandes qui n'ont aucune livraison correspondante
