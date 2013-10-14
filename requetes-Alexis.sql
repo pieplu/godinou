@@ -15,7 +15,7 @@ WHERE (description LIKE '%bl%') OR (description LIKE 'C%');
 -- 4.   Le numéro et le nom des clients qui ont placé une commande le 9 juillet 2000
 SELECT noClient, nomclient 
 FROM Client NATURAL JOIN Commande 
-WHERE datecommande = '9/07/2000'; 
+WHERE datecommande = '09/07/2000'; 
 
 
 -- 5.   Les noms des clients, numéros de commande, date de commande et noArticle pour les articles livrés le 4 juin 2000 dont la quantité livrée est supérieure à 1
@@ -50,9 +50,13 @@ WHERE prixUnitaire<20
 ORDER BY noArticle;
                                               
 -- 9.   Le noLivraison, noCommande, noArticle, la date de la commande, la quantité commandée, la date de la livraison, la quantitée livrée et le nombre de jours écoulés entre la commande et la livraison dans le cas où ce nombre a dépassé 2 jours et le nombre de jours écoulés depuis la commande jusqu’à aujourh’hui est supérieur à 100
-SELECT noLivraison, nocommande, noArticle, datecommande, quantite, datelivraison, quantiteLivree, (datelivraison-dateCommande) AS "NOMBRE JOURS ECOULES"
-FROM Livraison NATURAL JOIN DetailLivraison NATURAL JOIN lignecommande NATURAL JOIN Commande
-WHERE (datelivraison-dateCommande > 2) AND (SYSDATE-datecommande>100);
+SELECT noLivraison, nocommande, noArticle, datecommande, quantite, datelivraison, quantiteLivree, (dateLivraison-dateCommande) AS "NOMBRE JOURS ECOULES"
+FROM Commande
+NATURAL JOIN Lignecommande
+NATURAL JOIN DetailLivraison
+NATURAL JOIN Livraison
+WHERE (dateLivraison-dateCommande > 2) 
+AND (SYSDATE-datecommande>100);
 
 -- 10.  La liste des Articles triée en ordre décroissant de prix et pour chacun des prix en ordre croissant de numéro
 SELECT noArticle, description, prixUnitaire, QuantiteEnStock
@@ -75,7 +79,12 @@ FROM commande
 WHERE NOT EXISTS
     (SELECT *
     FROM DetailLivraison
-    WHERE commande.noCommande = noCommande);                                                                   
+    WHERE commande.noCommande = noCommande);    
+
+--ou
+SELECT noCommande
+FROM Commande NATURAL LEFT JOIN DetailLivraison
+WHERE noLivraison IS NULL;                                                               
 
 -- 13.  En deux colonnes, les paires de numéros de commandes (différentes) qui sont faites à la même date ainsi que la date de commande. Il faut éviter de répéter deux fois la même paire.
 SELECT c1.nocommande, c2.nocommande, c1.datecommande
