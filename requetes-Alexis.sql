@@ -83,7 +83,12 @@ FROM Commande c1, commande c2
 WHERE c1.datecommande = c2.datecommande AND c1.nocommande != c2.nocommande AND c1.nocommande < c2.nocommande;
 
 -- 14.  Le montant total commandé pour chaque paire (dateCommande, noArticle) dans les cas où le montant total dépasse 50$.
-Requête SQL …
+SELECT t1.datecommande, t1.noArticle, sum(t1.MONTANTOTALCOMMANDE) AS "MONTANT TOTAL COMMANDE"
+FROM (SELECT dateCommande,noArticle,(quantite * prixUnitaire) AS MONTANTOTALCOMMANDE
+FROM Commande NATURAL JOIN LigneCommande NATURAL JOIN Article
+WHERE (quantite*prixUnitaire)>50) t1
+GROUP BY t1.noArticle, t1.datecommande;
+
 
 DATECOMMAN  NOARTICLE MONTANT TOTAL COMMANDÉ                                    
 ---------- ---------- ----------------------                                    
