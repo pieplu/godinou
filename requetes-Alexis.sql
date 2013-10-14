@@ -89,24 +89,14 @@ FROM Commande NATURAL JOIN LigneCommande NATURAL JOIN Article
 WHERE (quantite*prixUnitaire)>50) t1
 GROUP BY t1.noArticle, t1.datecommande;
 
-
-DATECOMMAN  NOARTICLE MONTANT TOTAL COMMANDÉ                                    
----------- ---------- ----------------------                                    
-09/07/2000         10                  109,9                                    
-01/06/2000         70                  54,95                                    
-02/06/2000         40                  51,98                                    
-01/06/2000         10                  109,9                                    
-09/07/2000         20                  64,95                                    
-
-
 -- 15.  Les noArticle des articles commandés dans toutes et chacune des commandes du client 20
-
-Requête SQL …
-
- NOARTICLE                                                                      
-----------                                                                      
-        40                                                                      
-
-
-
-NB Pour la dernière requête, le même article soit être commandé dans toutes les commandes du client 20.
+SELECT noArticle
+FROM Article
+WHERE NOT EXISTS
+    (SELECT noCommande
+    FROM Commande
+    WHERE noClient=20 AND NOT EXISTS
+        (SELECT *
+        FROM LigneCommande
+        WHERE noArticle = Article.noArticle AND
+        noCommande= commande.noCommande));
