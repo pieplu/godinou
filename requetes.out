@@ -1,0 +1,130 @@
+SQL> START requetes.sql
+
+  NOCLIENT                                                                      
+----------                                                                      
+        30                                                                      
+        40                                                                      
+        20                                                                      
+        10                                                                      
+
+
+ NOARTICLE DESCRIPTION                                                          
+---------- --------------------                                                 
+        40 epinette bleue                                                       
+        70 Herbe ? puce                                                         
+
+
+ NOARTICLE DESCRIPTION                                                          
+---------- --------------------                                                 
+        10 C?dre en boule                                                       
+        40 epinette bleue                                                       
+        50 Chene                                                                
+        60 erable argente                                                       
+        81 Catalpa                                                              
+
+
+  NOCLIENT NOMCLIENT                                                            
+---------- --------------------                                                 
+        30 Lin B?                                                               
+        20 Dollard Tremblay                                                     
+
+
+NOMCLIENT            NOCOMMANDE DATECOMMAN  NOARTICLE                           
+-------------------- ---------- ---------- ----------                           
+Luc Sansom                    1 01/06/2000         10                           
+Dollard Tremblay              2 02/06/2000         40                           
+
+
+DATEEVENEM                                                                      
+----------                                                                      
+01/06/2000                                                                      
+02/06/2000                                                                      
+03/06/2000                                                                      
+04/06/2000                                                                      
+05/06/2000                                                                      
+
+
+ NOARTICLE QUANTITE LIVREE                                                      
+---------- ---------------                                                      
+        10              10                                                      
+        20               1                                                      
+        40               3                                                      
+        50               0                                                      
+        60               0                                                      
+        70               7                                                      
+        80               0                                                      
+        81               0                                                      
+        90               1                                                      
+        95               1                                                      
+
+10 rows selected.
+
+
+ NOARTICLE QUANTITE LIVREE                                                      
+---------- ---------------                                                      
+        20               1                                                      
+        60               0                                                      
+        95               1                                                      
+
+
+NOLIVRAISON NOCOMMANDE  NOARTICLE DATECOMMAN   QUANTITE DATELIVRAI              
+----------- ---------- ---------- ---------- ---------- ----------              
+QUANTITELIVREE NOMBRE JOURS ECOULES                                             
+-------------- --------------------                                             
+        103          1         90 01/06/2000          1 05/06/2000              
+             1                    4                                             
+                                                                                
+        101          1         10 01/06/2000         10 04/06/2000              
+             3                    3                                             
+                                                                                
+
+
+ NOARTICLE DESCRIPTION          PRIXUNITAIRE QUANTITEENSTOCK                    
+---------- -------------------- ------------ ---------------                    
+        80 Poirier                     26,99              10                    
+        40 epinette bleue              25,99              10                    
+        81 Catalpa                     25,99              10                    
+        90 Pommier                     25,99              10                    
+        50 Chene                       22,99              10                    
+        60 erable argente              15,99              10                    
+        95 Genevrier                   15,99              10                    
+        20 Sapin                       12,99              10                    
+        10 C?dre en boule              10,99              10                    
+        70 Herbe ? puce                10,99              10                    
+
+10 rows selected.
+
+
+NOMBREPLUSCHERQUE25 NOMBREMOINSCHERQUE15                                        
+------------------- --------------------                                        
+                  4                    3                                        
+
+
+NOCOMMANDE                                                                      
+----------                                                                      
+         8                                                                      
+         6                                                                      
+         7                                                                      
+
+
+NOCOMMANDE NOCOMMANDE DATECOMMAN                                                
+---------- ---------- ----------                                                
+         2          3 02/06/2000                                                
+         5          6 09/07/2000                                                
+         7          8 15/07/2000                                                
+
+
+DATECOMMAN  NOARTICLE MONTANT TOTAL COMMANDE                                    
+---------- ---------- ----------------------                                    
+01/06/2000         10                  109,9                                    
+09/07/2000         10                  109,9                                    
+02/06/2000         40                  51,98                                    
+01/06/2000         70                  54,95                                    
+09/07/2000         20                  64,95                                    
+
+
+ NOARTICLE                                                                      
+----------                                                                      
+        40                                                                      
+
+SQL> SPOOL OFF
