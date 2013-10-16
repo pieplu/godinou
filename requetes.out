@@ -43,12 +43,11 @@ SQL> -- 4.   Le numéro et le nom des clients qui ont placé une commande le 9 j
 SQL> SELECT noClient, nomclient
   2  FROM Client NATURAL JOIN Commande
   3  WHERE datecommande = '09/07/2000';
-WHERE datecommande = '09/07/2000'
-                     *
-ERROR at line 3:
-ORA-01830: Le modele  du format de date se termine avant la conversion de la 
-chaine d'entree entiere 
 
+  NOCLIENT NOMCLIENT                                                            
+---------- --------------------                                                 
+        30 Lin B?                                                               
+        20 Dollard Tremblay                                                     
 
 SQL> 
 SQL> 
@@ -61,12 +60,11 @@ SQL> SELECT nomClient, noCommande, dateCommande, noArticle
   5  NATURAL JOIN DetailLivraison
   6  NATURAL JOIN Livraison
   7  WHERE dateLivraison = '04/06/2000' AND quantiteLivree >1;
-WHERE dateLivraison = '04/06/2000' AND quantiteLivree >1
-                      *
-ERROR at line 7:
-ORA-01830: Le modele  du format de date se termine avant la conversion de la 
-chaine d'entree entiere 
 
+NOMCLIENT            NOCOMMANDE DATECOMMAN  NOARTICLE                           
+-------------------- ---------- ---------- ----------                           
+Luc Sansom                    1 01/06/2000         10                           
+Dollard Tremblay              2 02/06/2000         40                           
 
 SQL> 
 SQL> -- 6.   La liste des dates du mois de juin 2000 pour lesquelles il y a au moins une livraison ou une commande.
@@ -81,7 +79,13 @@ SQL> SELECT DISTINCT *
   8  	     FROM Livraison
   9  	     WHERE datelivraison LIKE '%06/2000%');
 
-no rows selected
+DATEEVENEM                                                                      
+----------                                                                      
+01/06/2000                                                                      
+02/06/2000                                                                      
+03/06/2000                                                                      
+04/06/2000                                                                      
+05/06/2000                                                                      
 
 SQL> 
 SQL> -- 7.   Les noArticle et la quantité totale livrée de l’article incluant les articles
@@ -136,15 +140,15 @@ SQL> SELECT noLivraison, nocommande, noArticle, datecommande, quantite, datelivr
   6  WHERE (dateLivraison-dateCommande > 2)
   7  AND (SYSDATE-datecommande>100);
 
-NOLIVRAISON NOCOMMANDE  NOARTICLE DATECOMM   QUANTITE DATELIVR QUANTITELIVREE   
------------ ---------- ---------- -------- ---------- -------- --------------   
-NOMBRE JOURS ECOULES                                                            
---------------------                                                            
-        103          1         90 00-06-01          1 00-06-05              1   
-                   4                                                            
+NOLIVRAISON NOCOMMANDE  NOARTICLE DATECOMMAN   QUANTITE DATELIVRAI              
+----------- ---------- ---------- ---------- ---------- ----------              
+QUANTITELIVREE NOMBRE JOURS ECOULES                                             
+-------------- --------------------                                             
+        103          1         90 01/06/2000          1 05/06/2000              
+             1                    4                                             
                                                                                 
-        101          1         10 00-06-01         10 00-06-04              3   
-                   3                                                            
+        101          1         10 01/06/2000         10 04/06/2000              
+             3                    3                                             
                                                                                 
 
 SQL> 
@@ -202,11 +206,11 @@ SQL> SELECT DISTINCT c1.noCommande, c2.noCommande, c2.dateCommande
   2  FROM Commande c1 , Commande c2
   3  WHERE c1.dateCommande = c2.dateCommande AND c1.noCommande != c2.noCommande AND c1.noCommande < c2.noCommande;
 
-NOCOMMANDE NOCOMMANDE DATECOMM                                                  
----------- ---------- --------                                                  
-         2          3 00-06-02                                                  
-         5          6 00-07-09                                                  
-         7          8 00-07-15                                                  
+NOCOMMANDE NOCOMMANDE DATECOMMAN                                                
+---------- ---------- ----------                                                
+         2          3 02/06/2000                                                
+         5          6 09/07/2000                                                
+         7          8 15/07/2000                                                
 
 SQL> 
 SQL> -- 14.  Le montant total commandé pour chaque paire (dateCommande, noArticle) dans les cas où le montant total dépasse 50$.
@@ -219,13 +223,13 @@ SQL> SELECT t1.datecommande, t1.noArticle, SUM(t1.MONTANTOTALCOMMANDE) as "MONTA
   7  WHERE (quantite*prixUnitaire)>50) t1
   8  GROUP BY t1.noArticle, t1.datecommande;
 
-DATECOMM  NOARTICLE MONTANT TOTAL COMMANDE                                      
--------- ---------- ----------------------                                      
-00-06-01         10                  109,9                                      
-00-07-09         10                  109,9                                      
-00-06-02         40                  51,98                                      
-00-06-01         70                  54,95                                      
-00-07-09         20                  64,95                                      
+DATECOMMAN  NOARTICLE MONTANT TOTAL COMMANDE                                    
+---------- ---------- ----------------------                                    
+01/06/2000         10                  109,9                                    
+09/07/2000         10                  109,9                                    
+02/06/2000         40                  51,98                                    
+01/06/2000         70                  54,95                                    
+09/07/2000         20                  64,95                                    
 
 SQL> 
 SQL> -- 15.  Les noArticle des articles commandés dans toutes et chacune des commandes du client 20
