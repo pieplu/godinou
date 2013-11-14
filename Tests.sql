@@ -22,3 +22,23 @@ SET note = 100
 WHERE codePermanent = 'DUGR08085001'; 
 
 -- c3
+UPDATE Inscription
+SET dateAbandon = NULL 
+WHERE codePermanent = 'DUGR08085001'; 
+
+UPDATE Inscription
+SET dateAbandon = '07/05/1989' 
+WHERE codePermanent = 'DUGR08085001'; 
+
+-- c4
+UPDATE Inscription
+SET dateAbandon = NULL, note = 100
+WHERE codePermanent = 'DUGR08085001'; 
+
+UPDATE Inscription
+SET dateAbandon = '07/05/2010' , note = 80
+WHERE codePermanent = 'DUGR08085001'; 
+
+UPDATE Inscription
+SET dateAbandon = '07/05/2010' , note = NULL
+WHERE codePermanent = 'DUGR08085001'; 
