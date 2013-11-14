@@ -9,3 +9,7 @@ ADD CONSTRAINT checkNote CHECK(note >= 0 AND note <= 100); --OK
 --C3
 ALTER TABLE inscription
 ADD CONSTRAINT checkDateAb CHECK(dateAbandon >= dateInscription OR dateAbandon IS NULL); --OK
+
+--C4
+ALTER TABLE inscription
+ADD CONSTRAINT checkAbandonNote CHECK((dateAbandon IS NOT NULL AND note IS NULL) OR (dateAbandon IS NULL)); --OK
