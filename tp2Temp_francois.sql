@@ -1,2 +1,39 @@
-alter table professeur
-add constraint checkCodeProf check(REGEXP_LIKE(codeProfesseur, '[A-Z]{4}[0-9]'));
+--C1
+ALTER TABLE professeur
+ADD CONSTRAINT checkCodeProf CHECK(REGEXP_LIKE(codeProfesseur, '[A-Z]{4}[0-9]')); --OK
+
+--C2
+ALTER TABLE inscription
+ADD CONSTRAINT checkNote CHECK(note >= 0 AND note <= 100); --OK
+
+--C3
+ALTER TABLE inscription
+ADD CONSTRAINT checkDateAb CHECK(dateAbandon >= dateInscription OR dateAbandon IS NULL); --OK
+
+--C4
+ALTER TABLE inscription
+ADD CONSTRAINT checkAbandonNote CHECK((dateAbandon IS NOT NULL AND note IS NULL) OR (dateAbandon IS NULL)); --OK
+
+--C5
+ALTER TABLE INSCRIPTION
+DROP CONSTRAINT CEREFGROUPECOURS;
+
+ALTER TABLE INSCRIPTION
+ADD CONSTRAINT CEREFGROUPECOURS FOREIGN KEY 	(sigle,noGroupe,codeSession) REFERENCES GroupeCours
+ON DELETE CASCADE;
+
+
+--C6
+CREATE OR REPLACE trigger limiteDiminutionMaxInscription
+before update of maxinscriptions on GROUPECOURS
+REFERENCING 
+OLD AS LIGNEAVANT
+NEW AS LIGNEAPRES
+FOR EACH ROW
+
+WHEN (LIGNEAPRES.MAXINSCRIPTIONs < LIGNEAVANT.MAXINSCRIPTIONs*0.9)
+BEGIN
+
+  :LIGNEAPRES.MAXINSCRIPTIONS := :LIGNEAVANT.MAXINSCRIPTIONS * 0.9;
+
+END;

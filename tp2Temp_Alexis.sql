@@ -13,3 +13,4 @@ ADD CONSTRAINT checkDateAb CHECK(dateAbandon >= dateInscription OR dateAbandon I
 --C4
 ALTER TABLE inscription
 ADD CONSTRAINT checkAbandonNote CHECK((dateAbandon IS NOT NULL AND note IS NULL) OR (dateAbandon IS NULL)); --OK
+

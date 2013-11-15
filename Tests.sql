@@ -42,3 +42,13 @@ WHERE codePermanent = 'DUGR08085001';
 UPDATE Inscription
 SET dateAbandon = '07/05/2010' , note = NULL
 WHERE codePermanent = 'DUGR08085001'; 
+
+
+--c5
+DELETE FROM GROUPECOURS
+WHERE NOGROUPE=20;
+
+--c6
+UPDATE GroupeCours
+SET maxinscriptions = 80
+WHERE NOGROUPE = 20 and SIGLE = 'INF1110'; 
