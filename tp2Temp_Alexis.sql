@@ -1,3 +1,8 @@
+
+--------------------
+--   QUESTION 1   --
+--------------------
+
 --C1
 ALTER TABLE professeur
 ADD CONSTRAINT checkCodeProf CHECK(REGEXP_LIKE(codeProfesseur, '[A-Z]{4}[0-9]')) --OK
@@ -103,5 +108,20 @@ ROLLBACK
 --   QUESTION 3   --
 --------------------
 
+ALTER TABLE GroupeCours ADD nbInscriptions NUMBER DEFAULT 0 NOT NULL
+/
+--C7
+ALTER TABLE GroupeCours 
+ADD CONSTRAINT nbInsNonNeg CHECK(nbInscriptions >= 0)
+/
 
+CREATE OR REPLACE FUNCTION fNbInscriptions
+	(	sigle,
+		noGroupe,
+		codeSession
+	) Return NUMBER
+IS
+	
+BEGIN
+	
 
