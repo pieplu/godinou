@@ -19,25 +19,89 @@ ALTER TABLE INSCRIPTION
 DROP CONSTRAINT CEREFGROUPECOURS
 /
 ALTER TABLE INSCRIPTION
-ADD CONSTRAINT CEREFGROUPECOURS FOREIGN KEY 	(sigle,noGroupe,codeSession) REFERENCES GroupeCours
+ADD CONSTRAINT CEREFGROUPECOURS FOREIGN KEY (sigle,noGroupe,codeSession) REFERENCES GroupeCours
 ON DELETE CASCADE
 /
 
 --C6
-CREATE OR REPLACE trigger limiteDiminutionMaxInscription
-before update of maxinscriptions on GROUPECOURS
-REFERENCING 
-OLD AS LIGNEAVANT
-NEW AS LIGNEAPRES
+CREATE OR REPLACE TRIGGER limiteDiminutionMaxInscription
+BEFORE UPDATE OF maxinscriptions ON GROUPECOURS
 FOR EACH ROW
-WHEN (LIGNEAPRES.MAXINSCRIPTIONs < LIGNEAVANT.MAXINSCRIPTIONs*0.9)
+WHEN (NEW.MAXINSCRIPTIONs < OLD.MAXINSCRIPTIONs*0.9)
 BEGIN
-
-  :LIGNEAPRES.MAXINSCRIPTIONS := :LIGNEAVANT.MAXINSCRIPTIONS * 0.9;
-
+  raise_application_error(-20102, 'Diminution de plus de 10% de maxInscriptions est interdite');
 END;
 /
 
+--------------------
+--   QUESTION 2   --
+--------------------
+
+PROMPT Test de violation de la contrainte C1
+INSERT INTO Professeur
+VALUES('ULLJT','Ullman','Jeffrey')
+/
+
+ROLLBACK 
+/
+
+PROMPT Test de violation de la contrainte C2
+UPDATE Inscription
+SET note=150
+WHERE codePermanent ='TREJ18088001' AND sigle = 'INF1110' AND noGroupe =
+AND codeSession = 32003
+/
+
+ROLLBACK 
+/
+
+PROMPT Test de violation de la contrainte C3
+UPDATE Inscription
+SET dateAbandon = '15/08/2003'
+WHERE codePermanent ='VANV05127201' AND sigle = 'INF3180' AND noGroupe =
+30 AND codeSession = 32003
+/
+
+ROLLBACK 
+/
+
+PROMPT Test de violation de la contrainte C4
+UPDATE Inscription
+SET dateAbandon = '17/08/2003'
+WHERE codePermanent ='TREJ18088001' AND sigle = 'INF1110' AND noGroupe =
+20 AND codeSession = 32003
+/
+
+ROLLBACK 
+/
+
+PROMPT Test de la contrainte C5
+SELECT * FROM Inscription
+WHERE sigle ='INF5180' AND noGroupe = 40 AND codeSession = 12004 
+/
+DELETE FROM GroupeCours
+WHERE sigle ='INF5180' AND noGroupe = 40 AND codeSession = 12004 
+/
+SELECT * FROM Inscription
+WHERE sigle ='INF5180' AND noGroupe = 40 AND codeSession = 12004 
+/
+
+ROLLBACK 
+/
+
+PROMPT Test de violation de la contrainte C6
+UPDATE GroupeCours
+SET maxInscriptions = maxInscriptions-20
+WHERE sigle = 'INF1110' AND noGroupe = 20 AND codeSession = 32003 
+/
+
+ROLLBACK 
+/
+
+
+--------------------
+--   QUESTION 3   --
+--------------------
 
 
 
