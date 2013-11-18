@@ -159,7 +159,7 @@ AFTER INSERT ON INSCRIPTION
 FOR EACH ROW
 BEGIN
 	UPDATE GroupeCours
-	SET nbInscriptions := fNbInscriptions(:NEW.sigle, :NEW.noGroupe,:NEW.codeSession)
+	SET nbInscriptions = nbInscriptions + 1
 	WHERE sigle = :NEW.sigle AND noGroupe = :NEW.noGroupe AND codeSession = :NEW.codeSession;
 END;
 /
