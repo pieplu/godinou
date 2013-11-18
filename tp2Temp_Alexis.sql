@@ -116,12 +116,34 @@ ADD CONSTRAINT nbInsNonNeg CHECK(nbInscriptions >= 0)
 /
 
 CREATE OR REPLACE FUNCTION fNbInscriptions
-	(	sigle,
-		noGroupe,
-		codeSession
+	(	sigle, IN Inscription.sigle%TYPE,
+		noGroupe IN Inscription.noGroupe%TYPE,
+		codeSession IN Inscription.codeSession%TYPE
 	) Return NUMBER
 IS
+	nbIncri NUMBER;
+
+	CURSOR ligneInscri
+	(unSigle IN Inscription.sigle%TYPE,
+	 unNoGroupe IN Inscription.noGroupe%TYPE,
+	 unCodeSession IN Inscription.codeSession%TYPE)
+	IS 
+		SELECT codePermanent
+		FROM	Inscription
+		WHERE unsigle = sigle AND unNoGroupe = noGroupe AND unCodeSession = codeSession AND dateAbandon IS NOT NULL;
 	
 BEGIN
-	
 
+	OPEN ligneInscri(sigle, noGroupe, codeSession);
+
+	LOOP
+		FETCH ligneInscri INTO sigle, noGroupe, codeSession;
+		EXIT WHEN ligneInscri%NOTFOUND
+		nbInscri := nbIncri + 1
+	END LOOP;
+
+	CLOSE ligneInscri;
+
+	Return nbIncri;
+END;
+/
