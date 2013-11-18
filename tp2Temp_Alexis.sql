@@ -122,13 +122,14 @@ CREATE OR REPLACE FUNCTION fNbInscriptions
 	) Return NUMBER
 IS
 	nbIncri NUMBER;
+	ligne %ROWTYPE;
 
 	CURSOR ligneInscri
 	(unSigle IN Inscription.sigle%TYPE,
 	 unNoGroupe IN Inscription.noGroupe%TYPE,
 	 unCodeSession IN Inscription.codeSession%TYPE)
 	IS 
-		SELECT codePermanent
+		SELECT *
 		FROM	Inscription
 		WHERE unsigle = sigle AND unNoGroupe = noGroupe AND unCodeSession = codeSession AND dateAbandon IS NOT NULL;
 	
@@ -137,13 +138,28 @@ BEGIN
 	OPEN ligneInscri(sigle, noGroupe, codeSession);
 
 	LOOP
-		FETCH ligneInscri INTO sigle, noGroupe, codeSession;
-		EXIT WHEN ligneInscri%NOTFOUND
-		nbInscri := nbIncri + 1
+		FETCH ligneInscri INTO ligne;
+		EXIT WHEN ligneInscri%NOTFOUND;
+		nbInscri := nbInscri + 1;
 	END LOOP;
 
 	CLOSE ligneInscri;
 
 	Return nbIncri;
+END;
+/
+
+
+--------------------
+--   QUESTION 5   --
+--------------------
+
+CREATE OR REPLACE TRIGGER MAJnbInscription
+AFTER INSERT ON INSCRIPTION
+FOR EACH ROW
+BEGIN
+	UPDATE GroupeCours
+	SET nbInscriptions := fNbInscriptions(:NEW.sigle, :NEW.noGroupe,:NEW.codeSession);
+
 END;
 /
