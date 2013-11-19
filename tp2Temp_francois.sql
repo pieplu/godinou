@@ -53,7 +53,7 @@ ROLLBACK
 PROMPT Test de violation de la contrainte C2
 UPDATE Inscription
 SET note=150
-WHERE codePermanent ='TREJ18088001' AND sigle = 'INF1110' AND noGroupe =
+WHERE codePermanent ='TREJ18088001' AND sigle = 'INF1110' AND noGroupe = 30
 AND codeSession = 32003
 /
 
@@ -73,8 +73,7 @@ ROLLBACK
 PROMPT Test de violation de la contrainte C4
 UPDATE Inscription
 SET dateAbandon = '17/08/2003'
-WHERE codePermanent ='TREJ18088001' AND sigle = 'INF1110' AND noGroupe =
-20 AND codeSession = 32003
+WHERE codePermanent ='TREJ18088001' AND sigle = 'INF1110' AND noGroupe =20 AND codeSession = 32003
 /
 
 ROLLBACK 
@@ -131,7 +130,7 @@ BEGIN
 select count(codePermanent) 
 into nbInscrits 
 from inscription 
-where sigle= lesigle and nogroupe = lenogroupe and codesession = lecodesession;  
+where sigle= lesigle and nogroupe = lenogroupe and codesession = lecodesession  and dateabandon is null;  
 Return nbInscrits;
 END;
 /
