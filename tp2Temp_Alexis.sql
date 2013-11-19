@@ -115,40 +115,46 @@ ALTER TABLE GroupeCours
 ADD CONSTRAINT nbInsNonNeg CHECK(nbInscriptions >= 0)
 /
 
-CREATE OR REPLACE FUNCTION fNbInscriptions
-	(	sigle, IN Inscription.sigle%TYPE,
-		noGroupe IN Inscription.noGroupe%TYPE,
-		codeSession IN Inscription.codeSession%TYPE
-	) Return NUMBER
+CREATE OR REPLACE 
+FUNCTION fNbInscriptions
+(lesigle Inscription.sigle%TYPE,
+lenoGroupe Inscription.noGroupe%TYPE,
+lecodeSession Inscription.codeSession%TYPE
+) 
+Return INTEGER
 IS
-	nbIncri NUMBER;
-	ligne %ROWTYPE;
-
-	CURSOR ligneInscri
-	(unSigle IN Inscription.sigle%TYPE,
-	 unNoGroupe IN Inscription.noGroupe%TYPE,
-	 unCodeSession IN Inscription.codeSession%TYPE)
-	IS 
-		SELECT *
-		FROM	Inscription
-		WHERE unsigle = sigle AND unNoGroupe = noGroupe AND unCodeSession = codeSession AND dateAbandon IS NOT NULL;
-	
+nbInscrits integer;
 BEGIN
-
-	OPEN ligneInscri(sigle, noGroupe, codeSession);
-
-	LOOP
-		FETCH ligneInscri INTO ligne;
-		EXIT WHEN ligneInscri%NOTFOUND;
-		nbInscri := nbInscri + 1;
-	END LOOP;
-
-	CLOSE ligneInscri;
-
-	Return nbIncri;
+	SELECT COUNT(codePermanent) 
+	INTO nbInscrits 
+	FROM inscription 
+	WHERE sigle= lesigle and nogroupe = lenogroupe and codesession = lecodesession;  
+	Return nbInscrits;
 END;
 /
 
+--UPDATE de la colonne nbInscriptions
+DECLARE
+  CURSOR groupe_cur 
+  IS
+  SELECT sigle, noGroupe, codeSession
+  FROM groupeCours;
+
+  groupe_rec groupe_cur%rowtype;
+
+BEGIN
+	OPEN groupe_cur;
+	LOOP
+		FETCH groupe_cur INTO groupe_rec;
+		EXIT WHEN groupe_cur%NOTFOUND;
+		
+		UPDATE groupecours
+			SET nbinscriptions = fnbinscriptions(groupe_rec.sigle, groupe_rec.nogroupe, groupe_rec.codesession)
+			WHERE sigle = groupe_rec.sigle and nogroupe = groupe_rec.nogroupe and codesession = groupe_rec.codesession AND dateAbandon IS NULL;
+	END LOOP;
+	CLOSE groupe_cur;
+END;
+/
 
 --------------------
 --   QUESTION 5   --
