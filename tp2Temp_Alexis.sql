@@ -53,7 +53,7 @@ ROLLBACK
 PROMPT Test de violation de la contrainte C2
 UPDATE Inscription
 SET note=150
-WHERE codePermanent ='TREJ18088001' AND sigle = 'INF1110' AND noGroupe =
+WHERE codePermanent ='TREJ18088001' AND sigle = 'INF1110' AND noGroupe = 20
 AND codeSession = 32003
 /
 
@@ -168,4 +168,14 @@ BEGIN
 	SET nbInscriptions = nbInscriptions + 1
 	WHERE sigle = :NEW.sigle AND noGroupe = :NEW.noGroupe AND codeSession = :NEW.codeSession;
 END;
+/
+
+--------------------
+--   QUESTION 6   --
+--------------------
+
+CREATE VIEW MoyenneParGroupe (SIGLE, NOGROUPE, CODESESSION, MOYENNENOTE)
+AS SELECT sigle, noGroupe, codeSession, AVG(note)
+FROM Inscription
+GROUP BY sigle, noGroupe, codeSession
 /
