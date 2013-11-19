@@ -5,19 +5,19 @@
 
 --C1
 ALTER TABLE professeur
-ADD CONSTRAINT checkCodeProf CHECK(REGEXP_LIKE(codeProfesseur, '[A-Z]{4}[0-9]')) --OK
+ADD CONSTRAINT checkCodeProf CHECK(REGEXP_LIKE(codeProfesseur, '[A-Z]{4}[0-9]')) 
 /
 --C2
 ALTER TABLE inscription
-ADD CONSTRAINT checkNote CHECK(note >= 0 AND note <= 100) --OK
+ADD CONSTRAINT checkNote CHECK(note >= 0 AND note <= 100) 
 /
 --C3
 ALTER TABLE inscription
-ADD CONSTRAINT checkDateAb CHECK(dateAbandon >= dateInscription OR dateAbandon IS NULL) --OK
+ADD CONSTRAINT checkDateAb CHECK(dateAbandon >= dateInscription OR dateAbandon IS NULL)
 /
 --C4
 ALTER TABLE inscription
-ADD CONSTRAINT checkAbandonNote CHECK((dateAbandon IS NOT NULL AND note IS NULL) OR (dateAbandon IS NULL)) --OK
+ADD CONSTRAINT checkAbandonNote CHECK((dateAbandon IS NOT NULL AND note IS NULL) OR (dateAbandon IS NULL))
 /
 --C5
 ALTER TABLE INSCRIPTION
@@ -63,8 +63,8 @@ ROLLBACK
 PROMPT Test de violation de la contrainte C3
 UPDATE Inscription
 SET dateAbandon = '15/08/2003'
-WHERE codePermanent ='VANV05127201' AND sigle = 'INF3180' AND noGroupe =
-30 AND codeSession = 32003
+WHERE codePermanent ='VANV05127201' AND sigle = 'INF3180' AND noGroupe =30 
+AND codeSession = 32003
 /
 
 ROLLBACK 
@@ -73,8 +73,8 @@ ROLLBACK
 PROMPT Test de violation de la contrainte C4
 UPDATE Inscription
 SET dateAbandon = '17/08/2003'
-WHERE codePermanent ='TREJ18088001' AND sigle = 'INF1110' AND noGroupe =
-20 AND codeSession = 32003
+WHERE codePermanent ='TREJ18088001' AND sigle = 'INF1110' AND noGroupe =20
+AND codeSession = 32003
 /
 
 ROLLBACK 
@@ -115,6 +115,7 @@ ALTER TABLE GroupeCours
 ADD CONSTRAINT nbInsNonNeg CHECK(nbInscriptions >= 0)
 /
 
+--Fonction fNbInscriptions
 CREATE OR REPLACE 
 FUNCTION fNbInscriptions
 (lesigle Inscription.sigle%TYPE,
@@ -178,4 +179,25 @@ CREATE VIEW MoyenneParGroupe (SIGLE, NOGROUPE, CODESESSION, MOYENNENOTE)
 AS SELECT sigle, noGroupe, codeSession, AVG(note)
 FROM Inscription
 GROUP BY sigle, noGroupe, codeSession
+/
+
+
+
+CREATE OR REPLACE TRIGGER InsteadUpdateMoyenneParGroupe
+INSTED OF UPDATE ON MoyenneParGroupe
+IS
+	nbNotes = SELECT COUNT(note) FROM inscription WHERE :OLD.sigle = :NEW.sigle AND :OLD.noGroupe = :NEW.noGroupe AND :OLD.codeSession = :NEW.codeSession;
+	vieuTotal = :OLD.moyenneNote * nbNotes;
+	nouvTotal = :NEW.moyenneNote * nbNotes;
+	dif = (nouvTotal - vieuTotal)/nbNotes;
+
+
+FOR EACH ROW
+        
+BEGIN
+	UPDATE Inscription
+	SET note := note + dif;
+	WHERE :OLD.sigle = :NEW.sigle AND :OLD.noGroupe = :NEW.noGroupe AND :OLD.codeSession = :NEW.codeSession;
+
+END;
 /
