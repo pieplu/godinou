@@ -1,3 +1,15 @@
+@ http://www.labunix.uqam.ca/~godin_r/INF3180/Aut2013/ScriptDossierEtudiantUQAMPourTP2.sql;
+
+SET SERVEROUTPUT ON format wrapped;
+SET FEEDBACK ON;
+
+-- ==========================================
+--  INF3180-30 – Fichiers et Base de Donnees
+--  Philippe Boyd - BOYP18029207
+--  Marcel Lejour - LEJM28068108
+--  Version : 13 novembre 2013
+-- ==========================================
+
 
 --------------------
 --   QUESTION 1   --
@@ -161,7 +173,7 @@ BEGIN
 		update groupecours
 			set nbinscriptions = fnbinscriptions(groupe_rec.sigle, groupe_rec.nogroupe, groupe_rec.codesession)
 			where sigle = groupe_rec.sigle and nogroupe = groupe_rec.nogroupe and codesession = groupe_rec.codesession;
-			--AJOUTER LA VERIF DATEABANDON != NULL
+			
 	END LOOP;
 
 	CLOSE groupe_cur;
@@ -182,30 +194,53 @@ END;
 CREATE OR REPLACE PROCEDURE TacheEnseignement(
     code professeur.codeProfesseur%TYPE)
 IS
-  nom professeur.nom%TYPE;
-  prenom professeur.prenom%TYPE;
-  code departement.nomDept%TYPE;
+  unnom professeur.nom%TYPE;
+  unprenom professeur.prenom%TYPE;
+  uncode professeur.codeprofesseur%TYPE;
     CURSOR infoCours
   IS
-    SELECT codeCours,
-      codeGrp,
-      dateDebut,
-      dateFin
+    SELECT sigle,
+      nogroupe,
+      codesession
     FROM groupecours
-    LEFT JOIN sessions
-    ON groupeCours.codeSess = sessions.codeSess
-    WHERE codeProf          = code;
+    natural JOIN professeur
+    WHERE codeProfesseur = code;
   TYPE MyRec
 IS
   RECORD
   (
-    codeCours groupeCours.codeCours%TYPE,
-    codeGrp groupeCours.codeGrp%TYPE,
-    dateDebut sessions.dateDebut%TYPE,
-    dateFin sessions.dateFin%TYPE);
+    lesigle groupeCours.sigle%TYPE,
+    lenogroupe groupeCours.nogroupe%TYPE,
+    lasession groupecours.codesession%TYPE);
   rec MyRec;
 
+BEGIN
+  SELECT nom,
+    prenom
+  INTO unnom,
+    unprenom
+  FROM professeur
+  WHERE codeProfesseur = code;
+  DBMS_OUTPUT.PUT_LINE('Code professeur : ' || code);
+  DBMS_OUTPUT.PUT_LINE('Nom : ' || unnom);
+  DBMS_OUTPUT.PUT_LINE('Prenom : ' || unprenom);
+  
+  DBMS_OUTPUT.PUT_LINE(RPAD('sigle', 15) || RPAD('noGroupe', 10) || RPAD('session', 20));
+  DBMS_OUTPUT.PUT_LINE(RPAD('---------', 15) || RPAD('-------', 10) || RPAD('------------------', 20));
+    OPEN infoCours;
+  LOOP
+    FETCH infoCours INTO rec;
+    EXIT
+  WHEN infoCours%NOTFOUND;
+    DBMS_OUTPUT.PUT_LINE(RPAD(rec.lesigle, 15) || RPAD(rec.lenogroupe, 10) || RPAD(rec.lasession, 20));
+  END LOOP;
+  CLOSE infoCours;
+EXCEPTION
+WHEN NO_DATA_FOUND THEN
+  DBMS_OUTPUT.PUT_LINE('Professeur inexistant');
+END;
 
+/
 
 
 
@@ -232,6 +267,48 @@ END;
 --   QUESTION 6   --
 --------------------
 
+CREATE VIEW MoyenneParGroupe (SIGLE, NOGROUPE, CODESESSION, MOYENNENOTE)
+AS SELECT sigle, noGroupe, codeSession, AVG(note)
+FROM Inscription
+GROUP BY sigle, noGroupe, codeSession
+/
+
+
+
+create or replace 
+trigger InsteadUpdateMoyenneParGroupe
+INSTEAD OF UPDATE ON MoyenneParGroupe
+FOR EACH ROW
+DECLARE
+	nbNotes Inscription.note%TYPE;
+	vieuTotal MoyenneParGroupe.moyenneNote%TYPE;
+	nouvTotal MoyenneParGroupe.moyenneNote%TYPE;
+	dif number;
+
+BEGIN
+	SELECT COUNT(note) INTO nbNotes FROM inscription WHERE :OLD.sigle = :NEW.sigle AND :OLD.noGroupe = :NEW.noGroupe AND :OLD.codeSession = :NEW.codeSession;
+	vieuTotal := :OLD.moyenneNote * nbNotes;
+	nouvTotal := :NEW.moyenneNote * nbNotes;
+	dif := (nouvTotal - vieuTotal)/nbNotes;
+	UPDATE Inscription
+	SET note = note + dif
+	WHERE :OLD.sigle = :NEW.sigle AND :OLD.noGroupe = :NEW.noGroupe AND :OLD.codeSession = :NEW.codeSession;
+
+END;
+/
+
+UPDATE MoyenneParGroupe
+SET moyenneNote = 70
+WHERE sigle = 'INF1130'AND noGroupe = 10 AND codeSession = 32003
+/
+
+SELECT * FROM MoyenneParGroupe
+WHERE sigle = 'INF1130'AND noGroupe = 10 AND codeSession = 32003
+/
+
+SELECT * FROM Inscription
+WHERE sigle = 'INF1130'AND noGroupe = 10 AND codeSession = 32003
+/
 
 
 
