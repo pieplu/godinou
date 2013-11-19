@@ -184,18 +184,21 @@ GROUP BY sigle, noGroupe, codeSession
 
 
 CREATE OR REPLACE TRIGGER InsteadUpdateMoyenneParGroupe
-INSTEAD OF UPDATE ON MoyenneParGroupe
-IS
+INSTEAD OF UPDATE ON MoyenneParGroupe	
+FOR EACH ROW
+DECLARE
+	nbNotes Inscription.note%TYPE;
+	vieuTotal MoyenneParGroupe.moyenneNote%TYPE;
+	nouvTotal MoyenneParGroupe.moyenneNote%TYPE;
+	dif number;
+        
+BEGIN
 	nbNotes = SELECT COUNT(note) FROM inscription WHERE :OLD.sigle = :NEW.sigle AND :OLD.noGroupe = :NEW.noGroupe AND :OLD.codeSession = :NEW.codeSession;
 	vieuTotal = :OLD.moyenneNote * nbNotes;
 	nouvTotal = :NEW.moyenneNote * nbNotes;
 	dif = (nouvTotal - vieuTotal)/nbNotes;
-
-FOR EACH ROW
-        
-BEGIN
 	UPDATE Inscription
-	SET note := note + dif;
+	SET note := note + dif
 	WHERE :OLD.sigle = :NEW.sigle AND :OLD.noGroupe = :NEW.noGroupe AND :OLD.codeSession = :NEW.codeSession;
 
 END;
