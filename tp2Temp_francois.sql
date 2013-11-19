@@ -63,8 +63,7 @@ ROLLBACK
 PROMPT Test de violation de la contrainte C3
 UPDATE Inscription
 SET dateAbandon = '15/08/2003'
-WHERE codePermanent ='VANV05127201' AND sigle = 'INF3180' AND noGroupe =
-30 AND codeSession = 32003
+WHERE codePermanent ='VANV05127201' AND sigle = 'INF3180' AND noGroupe = 30 AND codeSession = 32003
 /
 
 ROLLBACK 
@@ -178,6 +177,35 @@ END;
 --------------------
 --   QUESTION 4   --
 --------------------
+
+
+CREATE OR REPLACE PROCEDURE TacheEnseignement(
+    code professeur.codeProfesseur%TYPE)
+IS
+  nom professeur.nom%TYPE;
+  prenom professeur.prenom%TYPE;
+  code departement.nomDept%TYPE;
+    CURSOR infoCours
+  IS
+    SELECT codeCours,
+      codeGrp,
+      dateDebut,
+      dateFin
+    FROM groupecours
+    LEFT JOIN sessions
+    ON groupeCours.codeSess = sessions.codeSess
+    WHERE codeProf          = code;
+  TYPE MyRec
+IS
+  RECORD
+  (
+    codeCours groupeCours.codeCours%TYPE,
+    codeGrp groupeCours.codeGrp%TYPE,
+    dateDebut sessions.dateDebut%TYPE,
+    dateFin sessions.dateFin%TYPE);
+  rec MyRec;
+
+
 
 
 
