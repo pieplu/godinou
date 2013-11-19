@@ -1,13 +1,12 @@
 @ http://www.labunix.uqam.ca/~godin_r/INF3180/Aut2013/ScriptDossierEtudiantUQAMPourTP2.sql;
 
 SET SERVEROUTPUT ON format wrapped;
-SET FEEDBACK ON;
+--SET FEEDBACK ON;
 
 -- ==========================================
 --  INF3180-30 – Fichiers et Base de Donnees
---  Philippe Boyd - BOYP18029207
---  Marcel Lejour - LEJM28068108
---  Version : 13 novembre 2013
+--  Planet Francois - PLAF17069100
+--  Alexis Piéplu - PIEA07058900
 -- ==========================================
 
 
@@ -17,19 +16,19 @@ SET FEEDBACK ON;
 
 --C1
 ALTER TABLE professeur
-ADD CONSTRAINT checkCodeProf CHECK(REGEXP_LIKE(codeProfesseur, '[A-Z]{4}[0-9]')) --OK
+ADD CONSTRAINT checkCodeProf CHECK(REGEXP_LIKE(codeProfesseur, '[A-Z]{4}[0-9]')) 
 /
 --C2
 ALTER TABLE inscription
-ADD CONSTRAINT checkNote CHECK(note >= 0 AND note <= 100) --OK
+ADD CONSTRAINT checkNote CHECK(note >= 0 AND note <= 100) 
 /
 --C3
 ALTER TABLE inscription
-ADD CONSTRAINT checkDateAb CHECK(dateAbandon >= dateInscription OR dateAbandon IS NULL) --OK
+ADD CONSTRAINT checkDateAb CHECK(dateAbandon >= dateInscription OR dateAbandon IS NULL) 
 /
 --C4
 ALTER TABLE inscription
-ADD CONSTRAINT checkAbandonNote CHECK((dateAbandon IS NOT NULL AND note IS NULL) OR (dateAbandon IS NULL)) --OK
+ADD CONSTRAINT checkAbandonNote CHECK((dateAbandon IS NOT NULL AND note IS NULL) OR (dateAbandon IS NULL)) 
 /
 --C5
 ALTER TABLE INSCRIPTION
@@ -191,7 +190,7 @@ END;
 --------------------
 
 
-CREATE OR REPLACE PROCEDURE TacheEnseignement(
+CREATE OR REPLACE PROCEDURE pTacheEnseignement(
     code professeur.codeProfesseur%TYPE)
 IS
   unnom professeur.nom%TYPE;
@@ -205,14 +204,14 @@ IS
     FROM groupecours
     natural JOIN professeur
     WHERE codeProfesseur = code;
-  TYPE MyRec
+  TYPE prof_cur
 IS
-  RECORD
+  record
   (
     lesigle groupeCours.sigle%TYPE,
     lenogroupe groupeCours.nogroupe%TYPE,
     lasession groupecours.codesession%TYPE);
-  rec MyRec;
+  prof_rec prof_cur;
 
 BEGIN
   SELECT nom,
@@ -229,10 +228,10 @@ BEGIN
   DBMS_OUTPUT.PUT_LINE(RPAD('---------', 15) || RPAD('-------', 10) || RPAD('------------------', 20));
     OPEN infoCours;
   LOOP
-    FETCH infoCours INTO rec;
+    FETCH infoCours INTO prof_rec;
     EXIT
   WHEN infoCours%NOTFOUND;
-    DBMS_OUTPUT.PUT_LINE(RPAD(rec.lesigle, 15) || RPAD(rec.lenogroupe, 10) || RPAD(rec.lasession, 20));
+    DBMS_OUTPUT.PUT_LINE(RPAD(prof_rec.lesigle, 15) || RPAD(prof_rec.lenogroupe, 10) || RPAD(prof_rec.lasession, 20));
   END LOOP;
   CLOSE infoCours;
 EXCEPTION
@@ -241,8 +240,8 @@ WHEN NO_DATA_FOUND THEN
 END;
 
 /
-
-
+EXECUTE pTacheEnseignement('TREJ4');
+/
 
 
 --------------------
@@ -299,25 +298,13 @@ END;
 
 UPDATE MoyenneParGroupe
 SET moyenneNote = 70
-WHERE sigle = 'INF1130'AND noGroupe = 10 AND codeSession = 32003
+WHERE sigle = 'INF1130'AND noGroupe = 10 AND codeSession = 32003;
 /
 
 SELECT * FROM MoyenneParGroupe
-WHERE sigle = 'INF1130'AND noGroupe = 10 AND codeSession = 32003
+WHERE sigle = 'INF1130'AND noGroupe = 10 AND codeSession = 32003;
 /
 
 SELECT * FROM Inscription
-WHERE sigle = 'INF1130'AND noGroupe = 10 AND codeSession = 32003
+WHERE sigle = 'INF1130'AND noGroupe = 10 AND codeSession = 32003;
 /
-
-
-
-
-
-
-
-
-
-
-
-

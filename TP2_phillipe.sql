@@ -90,7 +90,7 @@ INTO professeur VALUES ('BLAY0', 'Blaquiere', 'Yves', 'INFO')
 INTO professeur VALUES ('BORE0', 'Boridy', 'Elie', 'INFO')
 INTO professeur VALUES ('BOUM0', 'Bouguessa', 'Mohamed', 'INFO')
 INTO professeur VALUES ('BOUM1', 'Boukadoum', 'Mounir', 'INFO')
-INTO professeur VALUES ('BRLS0', 'Brlek', 'Srecko', 'INFO')
+INTO professeur VALUES ('BRLS0', 'Brlek', 'Sprof_recko', 'INFO')
 INTO professeur VALUES ('CHEO0', 'Cherkaoui', 'Omar', 'INFO')
 INTO professeur VALUES ('DESD0', 'Deslandes', 'Dominic', 'INFO')
 INTO professeur VALUES ('DIAA0', 'Diallo', 'Abdoulaye', 'INFO')
@@ -234,15 +234,15 @@ IS
     LEFT JOIN sessions
     ON groupeCours.codeSess = sessions.codeSess
     WHERE codeProf          = code;
-  TYPE MyRec
+  TYPE prof_cur
 IS
-  RECORD
+  prof_recORD
   (
     codeCours groupeCours.codeCours%TYPE,
     codeGrp groupeCours.codeGrp%TYPE,
     dateDebut sessions.dateDebut%TYPE,
     dateFin sessions.dateFin%TYPE);
-  rec MyRec;
+  prof_prof_rec prof_cur;
 BEGIN
   SELECT nomProf,
     prenomProf,
@@ -261,10 +261,10 @@ BEGIN
   DBMS_OUTPUT.PUT_LINE(RPAD('---------', 15) || RPAD('-------', 10) || RPAD('------------------', 20) || RPAD('----------------', 20));
     OPEN infoCours;
   LOOP
-    FETCH infoCours INTO rec;
+    FETCH infoCours INTO prof_rec;
     EXIT
   WHEN infoCours%NOTFOUND;
-    DBMS_OUTPUT.PUT_LINE(RPAD(rec.codeCours, 15) || RPAD(rec.codeGrp, 10) || RPAD(rec.dateDebut, 20) || RPAD(rec.dateFin, 20));
+    DBMS_OUTPUT.PUT_LINE(RPAD(prof_rec.codeCours, 15) || RPAD(prof_rec.codeGrp, 10) || RPAD(prof_rec.dateDebut, 20) || RPAD(prof_rec.dateFin, 20));
   END LOOP;
   CLOSE infoCours;
 EXCEPTION
