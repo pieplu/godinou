@@ -128,7 +128,7 @@ BEGIN
 	SELECT COUNT(codePermanent) 
 	INTO nbInscrits 
 	FROM inscription 
-	WHERE sigle= lesigle and nogroupe = lenogroupe and codesession = lecodesession;  
+	WHERE sigle= lesigle and nogroupe = lenogroupe and codesession = lecodesession and dateabandon is NULL;  
 	Return nbInscrits;
 END;
 /
@@ -150,7 +150,7 @@ BEGIN
 		
 		UPDATE groupecours
 			SET nbinscriptions = fnbinscriptions(groupe_rec.sigle, groupe_rec.nogroupe, groupe_rec.codesession)
-			WHERE sigle = groupe_rec.sigle and nogroupe = groupe_rec.nogroupe and codesession = groupe_rec.codesession AND dateAbandon IS NULL;
+			WHERE sigle = groupe_rec.sigle and nogroupe = groupe_rec.nogroupe and codesession = groupe_rec.codesession;
 	END LOOP;
 	CLOSE groupe_cur;
 END;
