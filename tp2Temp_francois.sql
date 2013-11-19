@@ -117,35 +117,103 @@ ADD CONSTRAINT nbInsNonNeg CHECK(nbInscriptions >= 0)
 
 create or replace 
 FUNCTION fNbInscriptions
-(sigle Inscription.sigle%TYPE,
-noGroupe Inscription.noGroupe%TYPE,
-codeSession Inscription.codeSession%TYPE
-) Return NUMBER
-IS
-nbIncri NUMBER;
+(lesigle Inscription.sigle%TYPE,
+lenoGroupe Inscription.noGroupe%TYPE,
+lecodeSession Inscription.codeSession%TYPE
+) 
+Return INTEGER
 
-CURSOR ligneInscri
-(unSigle IN Inscription.sigle%TYPE,
- unNoGroupe IN Inscription.noGroupe%TYPE,
- unCodeSession IN Inscription.codeSession%TYPE)
 IS
-SELECT codePermanent
-FROM Inscription
-WHERE unsigle = sigle AND unNoGroupe = noGroupe AND unCodeSession = codeSession AND dateAbandon IS NOT NULL;
 
+nbInscrits integer;
 BEGIN
 
-OPEN ligneInscri(sigle, noGroupe, codeSession);
-
-LOOP
-FETCH ligneInscri INTO sigle, noGroupe, codeSession;
-EXIT WHEN ligneInscri%NOTFOUND;
-nbInscri := nbIncri + 1;
-END LOOP;
-
-CLOSE ligneInscri;
-
-Return nbIncri;
+select count(codePermanent) 
+into nbInscrits 
+from inscription 
+where sigle= lesigle and nogroupe = lenogroupe and codesession = lecodesession;  
+Return nbInscrits;
 END;
-
 /
+
+
+
+
+--UPDATE de la colonne nbInscriptions
+
+DECLARE
+  
+  cursor groupe_cur 
+  IS
+  SELECT sigle, noGroupe, codeSession
+  from groupeCours;
+
+  groupe_rec groupe_cur%rowtype;
+
+
+
+BEGIN
+  
+	OPEN groupe_cur;
+
+	LOOP
+		FETCH groupe_cur INTO groupe_rec;
+		EXIT WHEN groupe_cur%NOTFOUND;
+		
+		update groupecours
+			set nbinscriptions = fnbinscriptions(groupe_rec.sigle, groupe_rec.nogroupe, groupe_rec.codesession)
+			where sigle = groupe_rec.sigle and nogroupe = groupe_rec.nogroupe and codesession = groupe_rec.codesession;
+			--AJOUTER LA VERIF DATEABANDON != NULL
+	END LOOP;
+
+	CLOSE groupe_cur;
+
+
+END;
+/
+
+
+
+
+
+--------------------
+--   QUESTION 4   --
+--------------------
+
+
+
+
+--------------------
+--   QUESTION 5   --
+--------------------
+CREATE OR REPLACE TRIGGER MAJnbInscription
+AFTER INSERT ON INSCRIPTION
+FOR EACH ROW
+BEGIN
+	UPDATE GroupeCours
+	SET nbInscriptions = nbInscriptions + 1
+	WHERE sigle = :NEW.sigle AND noGroupe = :NEW.noGroupe AND codeSession = :NEW.codeSession;
+END;
+/
+
+
+
+
+
+
+--------------------
+--   QUESTION 6   --
+--------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
