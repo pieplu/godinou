@@ -183,23 +183,37 @@ GROUP BY sigle, noGroupe, codeSession
 
 
 
-CREATE OR REPLACE TRIGGER InsteadUpdateMoyenneParGroupe
-INSTEAD OF UPDATE ON MoyenneParGroupe	
+create or replace 
+trigger InsteadUpdateMoyenneParGroupe
+INSTEAD OF UPDATE ON MoyenneParGroupe
 FOR EACH ROW
 DECLARE
 	nbNotes Inscription.note%TYPE;
 	vieuTotal MoyenneParGroupe.moyenneNote%TYPE;
 	nouvTotal MoyenneParGroupe.moyenneNote%TYPE;
 	dif number;
-        
+
 BEGIN
-	nbNotes = SELECT COUNT(note) FROM inscription WHERE :OLD.sigle = :NEW.sigle AND :OLD.noGroupe = :NEW.noGroupe AND :OLD.codeSession = :NEW.codeSession;
-	vieuTotal = :OLD.moyenneNote * nbNotes;
-	nouvTotal = :NEW.moyenneNote * nbNotes;
-	dif = (nouvTotal - vieuTotal)/nbNotes;
+	SELECT COUNT(note) INTO nbNotes FROM inscription WHERE :OLD.sigle = :NEW.sigle AND :OLD.noGroupe = :NEW.noGroupe AND :OLD.codeSession = :NEW.codeSession;
+	vieuTotal := :OLD.moyenneNote * nbNotes;
+	nouvTotal := :NEW.moyenneNote * nbNotes;
+	dif := (nouvTotal - vieuTotal)/nbNotes;
 	UPDATE Inscription
-	SET note := note + dif
+	SET note = note + dif
 	WHERE :OLD.sigle = :NEW.sigle AND :OLD.noGroupe = :NEW.noGroupe AND :OLD.codeSession = :NEW.codeSession;
 
 END;
+/
+
+UPDATE MoyenneParGroupe
+SET moyenneNote = 70
+WHERE sigle = 'INF1130'AND noGroupe = 10 AND codeSession = 32003
+/
+
+SELECT * FROM MoyenneParGroupe
+WHERE sigle = 'INF1130'AND noGroupe = 10 AND codeSession = 32003
+/
+
+SELECT * FROM Inscription
+WHERE sigle = 'INF1130'AND noGroupe = 10 AND codeSession = 32003
 /
