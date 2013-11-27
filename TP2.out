@@ -1,0 +1,1288 @@
+SQL> 
+SQL> SET SERVEROUTPUT ON format wrapped;
+SQL> 
+SQL> PROMPT Création des tables
+Création des tables
+SQL> DROP TABLE Inscription
+  2  /
+
+Table dropped.
+
+SQL> DROP TABLE GroupeCours
+  2  /
+
+Table dropped.
+
+SQL> DROP TABLE Préalable
+  2  /
+DROP TABLE Préalable
+           *
+ERROR at line 1:
+ORA-00942: Table ou vue inexistante 
+
+
+SQL> DROP TABLE Cours
+  2  /
+DROP TABLE Cours
+           *
+ERROR at line 1:
+ORA-02449: cles uniques/primaires de la table referencees par des cles 
+etrangeres 
+
+
+SQL> DROP TABLE SessionUQAM
+  2  /
+
+Table dropped.
+
+SQL> DROP TABLE Etudiant
+  2  /
+
+Table dropped.
+
+SQL> DROP TABLE Professeur
+  2  /
+
+Table dropped.
+
+SQL> ALTER SESSION SET NLS_DATE_FORMAT = 'DD/MM/YYYY'
+  2  /
+
+Session altered.
+
+SQL> CREATE TABLE Cours
+  2  (sigle    CHAR(7)	 NOT NULL,
+  3   titre    VARCHAR(50)   NOT NULL,
+  4   nbCredits  INTEGER   NOT NULL,
+  5   CONSTRAINT ClePrimaireCours PRIMARY KEY  (sigle)
+  6  )
+  7  /
+CREATE TABLE Cours
+             *
+ERROR at line 1:
+ORA-00955: ce nom d'objet existe deja 
+
+
+SQL> 
+SQL> CREATE TABLE Préalable
+  2  (sigle    CHAR(7)	 NOT NULL,
+  3   siglePréalable CHAR(7)	NOT NULL,
+  4   CONSTRAINT ClePrimairePréalable PRIMARY KEY  (sigle,siglePréalable),
+  5   CONSTRAINT CEsigleRefCours FOREIGN KEY   (sigle) REFERENCES Cours,
+  6   CONSTRAINT CEsiglePréalableRefCours FOREIGN KEY	(siglePréalable) REFERENCES Cours(sigle)
+  7  )
+  8  /
+ CONSTRAINT CEsigleRefCours FOREIGN KEY   (sigle) REFERENCES Cours,
+                            *
+ERROR at line 5:
+ORA-02264: nom deja utilise par une contrainte existante 
+
+
+SQL> CREATE TABLE SessionUQAM
+  2  (codeSession  INTEGER   NOT NULL,
+  3   dateDebut  DATE	 NOT NULL,
+  4   dateFin  DATE    NOT NULL,
+  5   CONSTRAINT ClePrimaireSessionUQAM PRIMARY KEY  (codeSession)
+  6  )
+  7  /
+
+Table created.
+
+SQL> CREATE TABLE Professeur
+  2  (codeProfesseur   CHAR(5) NOT NULL,
+  3   nom      VARCHAR(10) NOT NULL,
+  4   prenom   VARCHAR(10) NOT NULL,
+  5   CONSTRAINT ClePrimaireProfesseur PRIMARY KEY   (codeProfesseur)
+  6  )
+  7  /
+
+Table created.
+
+SQL> CREATE TABLE GroupeCours
+  2  (sigle    CHAR(7)	 NOT NULL,
+  3   noGroupe INTEGER	 NOT NULL,
+  4   codeSession  INTEGER   NOT NULL,
+  5   maxInscriptions  INTEGER	 NOT NULL,
+  6   codeProfesseur   CHAR(5) NOT NULL,
+  7  CONSTRAINT ClePrimaireGroupeCours PRIMARY KEY   (sigle,noGroupe,codeSession),
+  8  CONSTRAINT CESigleGroupeRefCours FOREIGN KEY  (sigle) REFERENCES Cours,
+  9  CONSTRAINT CECodeSessionRefSessionUQAM FOREIGN KEY  (codeSession) REFERENCES SessionUQAM,
+ 10  CONSTRAINT CEcodeProfRefProfesseur FOREIGN KEY(codeProfesseur) REFERENCES Professeur
+ 11  )
+ 12  /
+
+Table created.
+
+SQL> CREATE TABLE Etudiant
+  2  (codePermanent  CHAR(12)  NOT NULL,
+  3   nom    VARCHAR(10) NOT NULL,
+  4   prenom   VARCHAR(10) NOT NULL,
+  5   codeProgramme  INTEGER,
+  6  CONSTRAINT CléPrimaireEtudiant PRIMARY KEY  (codePermanent)
+  7  )
+  8  /
+
+Table created.
+
+SQL> CREATE TABLE Inscription
+  2  (codePermanent  CHAR(12)  NOT NULL,
+  3   sigle    CHAR(7)	 NOT NULL,
+  4   noGroupe INTEGER	 NOT NULL,
+  5   codeSession  INTEGER   NOT NULL,
+  6   dateInscription DATE   NOT NULL,
+  7   dateAbandon  DATE,
+  8   note   INTEGER,
+  9  CONSTRAINT CléPrimaireInscription PRIMARY KEY   (codePermanent,sigle,noGroupe,codeSession),
+ 10  CONSTRAINT CERefGroupeCours FOREIGN KEY   (sigle,noGroupe,codeSession) REFERENCES GroupeCours,
+ 11  CONSTRAINT CECodePermamentRefEtudiant FOREIGN KEY (codePermanent) REFERENCES Etudiant
+ 12  )
+ 13  /
+
+Table created.
+
+SQL> 
+SQL> PROMPT Insertion de données pour les essais
+Insertion de données pour les essais
+SQL> 
+SQL> INSERT INTO Cours
+  2  VALUES('INF3180','Fichiers et bases de données',3)
+  3  /
+INSERT INTO Cours
+*
+ERROR at line 1:
+ORA-00001: violation de contrainte unique (HJ991118.CLEPRIMAIRECOURS) 
+
+
+SQL> INSERT INTO Cours
+  2  VALUES('INF5180','Conception et exploitation d''une base de données',3)
+  3  /
+VALUES('INF5180','Conception et exploitation d''une base de données',3)
+                 *
+ERROR at line 2:
+ORA-12899: valeur trop grande pour la colonne "HJ991118"."COURS"."TITRE" 
+(reelle : 53, maximum : 50) 
+
+
+SQL> INSERT INTO Cours
+  2  VALUES('INF1110','Programmation I',3)
+  3  /
+INSERT INTO Cours
+*
+ERROR at line 1:
+ORA-00001: violation de contrainte unique (HJ991118.CLEPRIMAIRECOURS) 
+
+
+SQL> INSERT INTO Cours
+  2  VALUES('INF1130','Mathématiques pour informaticien',3)
+  3  /
+INSERT INTO Cours
+*
+ERROR at line 1:
+ORA-00001: violation de contrainte unique (HJ991118.CLEPRIMAIRECOURS) 
+
+
+SQL> INSERT INTO Cours
+  2  VALUES('INF2110','Programmation II',3)
+  3  /
+INSERT INTO Cours
+*
+ERROR at line 1:
+ORA-00001: violation de contrainte unique (HJ991118.CLEPRIMAIRECOURS) 
+
+
+SQL> INSERT INTO Cours
+  2  VALUES('INF3123','Programmation objet',3)
+  3  /
+INSERT INTO Cours
+*
+ERROR at line 1:
+ORA-00001: violation de contrainte unique (HJ991118.CLEPRIMAIRECOURS) 
+
+
+SQL> INSERT INTO Cours
+  2  VALUES('INF2160','Paradigmes de programmation',3)
+  3  /
+INSERT INTO Cours
+*
+ERROR at line 1:
+ORA-00001: violation de contrainte unique (HJ991118.CLEPRIMAIRECOURS) 
+
+
+SQL> 
+SQL> INSERT INTO Préalable
+  2  VALUES('INF2110','INF1110')
+  3  /
+INSERT INTO Préalable
+            *
+ERROR at line 1:
+ORA-00942: Table ou vue inexistante 
+
+
+SQL> INSERT INTO Préalable
+  2  VALUES('INF2160','INF1130')
+  3  /
+INSERT INTO Préalable
+            *
+ERROR at line 1:
+ORA-00942: Table ou vue inexistante 
+
+
+SQL> INSERT INTO Préalable
+  2  VALUES('INF2160','INF2110')
+  3  /
+INSERT INTO Préalable
+            *
+ERROR at line 1:
+ORA-00942: Table ou vue inexistante 
+
+
+SQL> INSERT INTO Préalable
+  2  VALUES('INF3180','INF2110')
+  3  /
+INSERT INTO Préalable
+            *
+ERROR at line 1:
+ORA-00942: Table ou vue inexistante 
+
+
+SQL> INSERT INTO Préalable
+  2  VALUES('INF3123','INF2110')
+  3  /
+INSERT INTO Préalable
+            *
+ERROR at line 1:
+ORA-00942: Table ou vue inexistante 
+
+
+SQL> INSERT INTO Préalable
+  2  VALUES('INF5180','INF3180')
+  3  /
+INSERT INTO Préalable
+            *
+ERROR at line 1:
+ORA-00942: Table ou vue inexistante 
+
+
+SQL> 
+SQL> INSERT INTO SessionUQAM
+  2  VALUES(32003,'3/09/2003','17/12/2003')
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO SessionUQAM
+  2  VALUES(12004,'8/01/2004','2/05/2004')
+  3  /
+
+1 row created.
+
+SQL> 
+SQL> INSERT INTO Professeur
+  2  VALUES('TREJ4','Tremblay','Jean')
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Professeur
+  2  VALUES('DEVL2','De Vinci','Leonard')
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Professeur
+  2  VALUES('PASB1','Pascal','Blaise')
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Professeur
+  2  VALUES('GOLA1','Goldberg','Adele')
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Professeur
+  2  VALUES('KNUD1','Knuth','Donald')
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Professeur
+  2  VALUES('GALE9','Galois','Evariste')
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Professeur
+  2  VALUES('CASI0','Casse','Illa')
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Professeur
+  2  VALUES('SAUV5','Sauvé','André')
+  3  /
+
+1 row created.
+
+SQL> 
+SQL> INSERT INTO GroupeCours
+  2  VALUES('INF1110',20,32003,100,'TREJ4')
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO GroupeCours
+  2  VALUES('INF1110',30,32003,100,'PASB1')
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO GroupeCours
+  2  VALUES('INF1130',10,32003,100,'PASB1')
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO GroupeCours
+  2  VALUES('INF1130',30,32003,100,'GALE9')
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO GroupeCours
+  2  VALUES('INF2110',10,32003,100,'TREJ4')
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO GroupeCours
+  2  VALUES('INF3123',20,32003,50,'GOLA1')
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO GroupeCours
+  2  VALUES('INF3123',30,32003,50,'GOLA1')
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO GroupeCours
+  2  VALUES('INF3180',30,32003,50,'DEVL2')
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO GroupeCours
+  2  VALUES('INF3180',40,32003,50,'DEVL2')
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO GroupeCours
+  2  VALUES('INF5180',10,32003,50,'KNUD1')
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO GroupeCours
+  2  VALUES('INF5180',40,32003,50,'KNUD1')
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO GroupeCours
+  2  VALUES('INF1110',20,12004,100,'TREJ4')
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO GroupeCours
+  2  VALUES('INF1110',30,12004,100,'TREJ4')
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO GroupeCours
+  2  VALUES('INF2110',10,12004,100,'PASB1')
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO GroupeCours
+  2  VALUES('INF2110',40,12004,100,'PASB1')
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO GroupeCours
+  2  VALUES('INF3123',20,12004,50,'GOLA1')
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO GroupeCours
+  2  VALUES('INF3123',30,12004,50,'GOLA1')
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO GroupeCours
+  2  VALUES('INF3180',10,12004,50,'DEVL2')
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO GroupeCours
+  2  VALUES('INF3180',30,12004,50,'DEVL2')
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO GroupeCours
+  2  VALUES('INF5180',10,12004,50,'DEVL2')
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO GroupeCours
+  2  VALUES('INF5180',40,12004,50,'GALE9')
+  3  /
+
+1 row created.
+
+SQL> 
+SQL> INSERT INTO Etudiant
+  2  VALUES('TREJ18088001','Tremblay','Jean',7416)
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Etudiant
+  2  VALUES('TREL14027801','Tremblay','Lucie',7416)
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Etudiant
+  2  VALUES('DEGE10027801','Degas','Edgar',7416)
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Etudiant
+  2  VALUES('MONC05127201','Monet','Claude',7316)
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Etudiant
+  2  VALUES('VANV05127201','Van Gogh','Vincent',7316)
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Etudiant
+  2  VALUES('MARA25087501','Marshall','Amanda',null)
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Etudiant
+  2  VALUES('STEG03106901','Stephani','Gwen',7416)
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Etudiant
+  2  VALUES('EMEK10106501','Emerson','Keith',7416)
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Etudiant
+  2  VALUES('DUGR08085001','Duguay','Roger',null)
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Etudiant
+  2  VALUES('LAVP08087001','Lavoie','Paul',null)
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Etudiant
+  2  VALUES('TREY09087501','Tremblay','Yvon',7316)
+  3  /
+
+1 row created.
+
+SQL> 
+SQL> INSERT INTO Inscription
+  2  VALUES('TREJ18088001','INF1110',20,32003,'16/08/2003',null,80)
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Inscription
+  2  VALUES('LAVP08087001','INF1110',20,32003,'16/08/2003',null,80)
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Inscription
+  2  VALUES('TREL14027801','INF1110',30,32003,'17/08/2003',null,90)
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Inscription
+  2  VALUES('MARA25087501','INF1110',20,32003,'20/08/2003',null,80)
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Inscription
+  2  VALUES('STEG03106901','INF1110',20,32003,'17/08/2003',null,70)
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Inscription
+  2  VALUES('TREJ18088001','INF1130',10,32003,'16/08/2003',null,70)
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Inscription
+  2  VALUES('TREL14027801','INF1130',30,32003,'17/08/2003',null,80)
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Inscription
+  2  VALUES('MARA25087501','INF1130',10,32003,'22/08/2003',null,90)
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Inscription
+  2  VALUES('DEGE10027801','INF3180',30,32003,'16/08/2003',null,90)
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Inscription
+  2  VALUES('MONC05127201','INF3180',30,32003,'19/08/2003',null,60)
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Inscription
+  2  VALUES('VANV05127201','INF3180',30,32003,'16/08/2003','20/09/2003',null)
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Inscription
+  2  VALUES('EMEK10106501','INF3180',40,32003,'19/08/2003',null,80)
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Inscription
+  2  VALUES('DUGR08085001','INF3180',40,32003,'19/08/2003',null,70)
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Inscription
+  2  VALUES('TREJ18088001','INF2110',10,12004,'19/12/2003',null,80)
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Inscription
+  2  VALUES('TREL14027801','INF2110',10,12004,'20/12/2003',null,90)
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Inscription
+  2  VALUES('MARA25087501','INF2110',40,12004,'19/12/2003',null,90)
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Inscription
+  2  VALUES('STEG03106901','INF2110',40,12004, '10/12/2003',null,70)
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Inscription
+  2  VALUES('VANV05127201','INF3180',10,12004, '18/12/2003',null,90)
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Inscription
+  2  VALUES('DEGE10027801','INF5180',10,12004, '15/12/2003',null,90)
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Inscription
+  2  VALUES('MONC05127201','INF5180',10,12004, '19/12/2003','22/01/2004',null)
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Inscription
+  2  VALUES('EMEK10106501','INF5180',40,12004, '19/12/2003',null,80)
+  3  /
+
+1 row created.
+
+SQL> INSERT INTO Inscription
+  2  VALUES('DUGR08085001','INF5180',10,12004, '19/12/2003',null,80)
+  3  /
+
+1 row created.
+
+SQL> COMMIT
+  2  /
+
+Commit complete.
+
+SQL> PROMPT Contenu des tables
+Contenu des tables
+SQL> SELECT * FROM Cours
+  2  /
+
+SIGLE   TITRE                                               NBCREDITS           
+------- -------------------------------------------------- ----------           
+INF3180 Fichiers et bases de donn?es                                3           
+INF5180 Conception et exploitation d'une base de donn?es            3           
+INF1110 Programmation I                                             3           
+INF1130 Math?matiques pour informaticien                            3           
+INF2110 Programmation II                                            3           
+INF3123 Programmation objet                                         3           
+INF2160 Paradigmes de programmation                                 3           
+
+7 rows selected.
+
+SQL> SELECT * FROM Préalable
+  2  /
+SELECT * FROM Préalable
+              *
+ERROR at line 1:
+ORA-00942: Table ou vue inexistante 
+
+
+SQL> SELECT * FROM SessionUQAM
+  2  /
+
+CODESESSION DATEDEBUT  DATEFIN                                                  
+----------- ---------- ----------                                               
+      32003 03/09/2003 17/12/2003                                               
+      12004 08/01/2004 02/05/2004                                               
+
+SQL> SELECT * FROM Professeur
+  2  /
+
+CODEP NOM        PRENOM                                                         
+----- ---------- ----------                                                     
+TREJ4 Tremblay   Jean                                                           
+DEVL2 De Vinci   Leonard                                                        
+PASB1 Pascal     Blaise                                                         
+GOLA1 Goldberg   Adele                                                          
+KNUD1 Knuth      Donald                                                         
+GALE9 Galois     Evariste                                                       
+CASI0 Casse      Illa                                                           
+SAUV5 Sauv??     Andr??                                                         
+
+8 rows selected.
+
+SQL> SELECT * FROM GroupeCours
+  2  /
+
+SIGLE     NOGROUPE CODESESSION MAXINSCRIPTIONS CODEP                            
+------- ---------- ----------- --------------- -----                            
+INF1110         20       32003             100 TREJ4                            
+INF1110         30       32003             100 PASB1                            
+INF1130         10       32003             100 PASB1                            
+INF1130         30       32003             100 GALE9                            
+INF2110         10       32003             100 TREJ4                            
+INF3123         20       32003              50 GOLA1                            
+INF3123         30       32003              50 GOLA1                            
+INF3180         30       32003              50 DEVL2                            
+INF3180         40       32003              50 DEVL2                            
+INF5180         10       32003              50 KNUD1                            
+INF5180         40       32003              50 KNUD1                            
+
+SIGLE     NOGROUPE CODESESSION MAXINSCRIPTIONS CODEP                            
+------- ---------- ----------- --------------- -----                            
+INF1110         20       12004             100 TREJ4                            
+INF1110         30       12004             100 TREJ4                            
+INF2110         10       12004             100 PASB1                            
+INF2110         40       12004             100 PASB1                            
+INF3123         20       12004              50 GOLA1                            
+INF3123         30       12004              50 GOLA1                            
+INF3180         10       12004              50 DEVL2                            
+INF3180         30       12004              50 DEVL2                            
+INF5180         10       12004              50 DEVL2                            
+INF5180         40       12004              50 GALE9                            
+
+21 rows selected.
+
+SQL> SELECT * FROM Etudiant
+  2  /
+
+CODEPERMANEN NOM        PRENOM     CODEPROGRAMME                                
+------------ ---------- ---------- -------------                                
+TREJ18088001 Tremblay   Jean                7416                                
+TREL14027801 Tremblay   Lucie               7416                                
+DEGE10027801 Degas      Edgar               7416                                
+MONC05127201 Monet      Claude              7316                                
+VANV05127201 Van Gogh   Vincent             7316                                
+MARA25087501 Marshall   Amanda                                                  
+STEG03106901 Stephani   Gwen                7416                                
+EMEK10106501 Emerson    Keith               7416                                
+DUGR08085001 Duguay     Roger                                                   
+LAVP08087001 Lavoie     Paul                                                    
+TREY09087501 Tremblay   Yvon                7316                                
+
+11 rows selected.
+
+SQL> SELECT * FROM Inscription
+  2  /
+
+CODEPERMANEN SIGLE     NOGROUPE CODESESSION DATEINSCRI DATEABANDO       NOTE    
+------------ ------- ---------- ----------- ---------- ---------- ----------    
+TREJ18088001 INF1110         20       32003 16/08/2003                    80    
+LAVP08087001 INF1110         20       32003 16/08/2003                    80    
+TREL14027801 INF1110         30       32003 17/08/2003                    90    
+MARA25087501 INF1110         20       32003 20/08/2003                    80    
+STEG03106901 INF1110         20       32003 17/08/2003                    70    
+TREJ18088001 INF1130         10       32003 16/08/2003                    70    
+TREL14027801 INF1130         30       32003 17/08/2003                    80    
+MARA25087501 INF1130         10       32003 22/08/2003                    90    
+DEGE10027801 INF3180         30       32003 16/08/2003                    90    
+MONC05127201 INF3180         30       32003 19/08/2003                    60    
+VANV05127201 INF3180         30       32003 16/08/2003 20/09/2003               
+
+CODEPERMANEN SIGLE     NOGROUPE CODESESSION DATEINSCRI DATEABANDO       NOTE    
+------------ ------- ---------- ----------- ---------- ---------- ----------    
+EMEK10106501 INF3180         40       32003 19/08/2003                    80    
+DUGR08085001 INF3180         40       32003 19/08/2003                    70    
+TREJ18088001 INF2110         10       12004 19/12/2003                    80    
+TREL14027801 INF2110         10       12004 20/12/2003                    90    
+MARA25087501 INF2110         40       12004 19/12/2003                    90    
+STEG03106901 INF2110         40       12004 10/12/2003                    70    
+VANV05127201 INF3180         10       12004 18/12/2003                    90    
+DEGE10027801 INF5180         10       12004 15/12/2003                    90    
+MONC05127201 INF5180         10       12004 19/12/2003 22/01/2004               
+EMEK10106501 INF5180         40       12004 19/12/2003                    80    
+DUGR08085001 INF5180         10       12004 19/12/2003                    80    
+
+22 rows selected.
+
+SQL> 
+SQL> 
+SQL> --------------------
+SQL> --   QUESTION 1   --
+SQL> --------------------
+SQL> 
+SQL> --C1
+SQL> ALTER TABLE professeur
+  2  ADD CONSTRAINT checkCodeProf CHECK(REGEXP_LIKE(codeProfesseur, '[A-Z]{4}[0-9]'))
+  3  /
+
+Table altered.
+
+SQL> --C2
+SQL> ALTER TABLE inscription
+  2  ADD CONSTRAINT checkNote CHECK(note >= 0 AND note <= 100)
+  3  /
+
+Table altered.
+
+SQL> --C3
+SQL> ALTER TABLE inscription
+  2  ADD CONSTRAINT checkDateAb CHECK(dateAbandon >= dateInscription OR dateAbandon IS NULL)
+  3  /
+
+Table altered.
+
+SQL> --C4
+SQL> ALTER TABLE inscription
+  2  ADD CONSTRAINT checkAbandonNote CHECK((dateAbandon IS NOT NULL AND note IS NULL) OR (dateAbandon IS NULL))
+  3  /
+
+Table altered.
+
+SQL> --C5
+SQL> ALTER TABLE INSCRIPTION
+  2  DROP CONSTRAINT CEREFGROUPECOURS
+  3  /
+
+Table altered.
+
+SQL> ALTER TABLE INSCRIPTION
+  2  ADD CONSTRAINT CEREFGROUPECOURS FOREIGN KEY (sigle,noGroupe,codeSession) REFERENCES GroupeCours
+  3  ON DELETE CASCADE
+  4  /
+
+Table altered.
+
+SQL> 
+SQL> --C6
+SQL> CREATE OR REPLACE TRIGGER limiteDiminutionMaxInscription
+  2  BEFORE UPDATE OF maxinscriptions ON GROUPECOURS
+  3  FOR EACH ROW
+  4  WHEN (NEW.MAXINSCRIPTIONs < OLD.MAXINSCRIPTIONs*0.9)
+  5  BEGIN
+  6    raise_application_error(-20102, 'Diminution de plus de 10% de maxInscriptions est interdite');
+  7  END;
+  8  /
+
+Trigger created.
+
+SQL> 
+SQL> --------------------
+SQL> --   QUESTION 2   --
+SQL> --------------------
+SQL> 
+SQL> PROMPT Test de violation de la contrainte C1
+Test de violation de la contrainte C1
+SQL> INSERT INTO Professeur
+  2  VALUES('ULLJT','Ullman','Jeffrey')
+  3  /
+INSERT INTO Professeur
+*
+ERROR at line 1:
+ORA-02290: violation de contraintes (HJ991118.CHECKCODEPROF) de verification 
+
+
+SQL> 
+SQL> ROLLBACK
+  2  /
+
+Rollback complete.
+
+SQL> 
+SQL> PROMPT Test de violation de la contrainte C2
+Test de violation de la contrainte C2
+SQL> UPDATE Inscription
+  2  SET note=150
+  3  WHERE codePermanent ='TREJ18088001' AND sigle = 'INF1110' AND noGroupe = 30
+  4  AND codeSession = 32003
+  5  /
+
+0 rows updated.
+
+SQL> 
+SQL> ROLLBACK
+  2  /
+
+Rollback complete.
+
+SQL> 
+SQL> PROMPT Test de violation de la contrainte C3
+Test de violation de la contrainte C3
+SQL> UPDATE Inscription
+  2  SET dateAbandon = '15/08/2003'
+  3  WHERE codePermanent ='VANV05127201' AND sigle = 'INF3180' AND noGroupe = 30 AND codeSession = 32003
+  4  /
+UPDATE Inscription
+*
+ERROR at line 1:
+ORA-02290: violation de contraintes (HJ991118.CHECKDATEAB) de verification 
+
+
+SQL> 
+SQL> ROLLBACK
+  2  /
+
+Rollback complete.
+
+SQL> 
+SQL> PROMPT Test de violation de la contrainte C4
+Test de violation de la contrainte C4
+SQL> UPDATE Inscription
+  2  SET dateAbandon = '17/08/2003'
+  3  WHERE codePermanent ='TREJ18088001' AND sigle = 'INF1110' AND noGroupe =20 AND codeSession = 32003
+  4  /
+UPDATE Inscription
+*
+ERROR at line 1:
+ORA-02290: violation de contraintes (HJ991118.CHECKABANDONNOTE) de verification 
+
+
+SQL> 
+SQL> ROLLBACK
+  2  /
+
+Rollback complete.
+
+SQL> 
+SQL> PROMPT Test de la contrainte C5
+Test de la contrainte C5
+SQL> SELECT * FROM Inscription
+  2  WHERE sigle ='INF5180' AND noGroupe = 40 AND codeSession = 12004
+  3  /
+
+CODEPERMANEN SIGLE     NOGROUPE CODESESSION DATEINSCRI DATEABANDO       NOTE    
+------------ ------- ---------- ----------- ---------- ---------- ----------    
+EMEK10106501 INF5180         40       12004 19/12/2003                    80    
+
+SQL> DELETE FROM GroupeCours
+  2  WHERE sigle ='INF5180' AND noGroupe = 40 AND codeSession = 12004
+  3  /
+
+1 row deleted.
+
+SQL> SELECT * FROM Inscription
+  2  WHERE sigle ='INF5180' AND noGroupe = 40 AND codeSession = 12004
+  3  /
+
+no rows selected
+
+SQL> 
+SQL> ROLLBACK
+  2  /
+
+Rollback complete.
+
+SQL> 
+SQL> PROMPT Test de violation de la contrainte C6
+Test de violation de la contrainte C6
+SQL> UPDATE GroupeCours
+  2  SET maxInscriptions = maxInscriptions-20
+  3  WHERE sigle = 'INF1110' AND noGroupe = 20 AND codeSession = 32003
+  4  /
+UPDATE GroupeCours
+       *
+ERROR at line 1:
+ORA-20102: Diminution de plus de 10% de maxInscriptions est interdite 
+ORA-06512: a "HJ991118.LIMITEDIMINUTIONMAXINSCRIPTION", ligne 2 
+ORA-04088: erreur lors d'execution du declencheur 
+'HJ991118.LIMITEDIMINUTIONMAXINSCRIPTION' 
+
+
+SQL> 
+SQL> ROLLBACK
+  2  /
+
+Rollback complete.
+
+SQL> 
+SQL> 
+SQL> --------------------
+SQL> --   QUESTION 3   --
+SQL> --------------------
+SQL> 
+SQL> ALTER TABLE GroupeCours ADD nbInscriptions NUMBER DEFAULT 0 NOT NULL
+  2  /
+
+Table altered.
+
+SQL> --C7
+SQL> ALTER TABLE GroupeCours
+  2  ADD CONSTRAINT nbInsNonNeg CHECK(nbInscriptions >= 0)
+  3  /
+
+Table altered.
+
+SQL> 
+SQL> CREATE OR REPLACE
+  2  FUNCTION fNbInscriptions
+  3  (lesigle Inscription.sigle%TYPE,
+  4  lenoGroupe Inscription.noGroupe%TYPE,
+  5  lecodeSession Inscription.codeSession%TYPE
+  6  )
+  7  Return INTEGER
+  8  IS
+  9  nbInscrits INTEGER;
+ 10  BEGIN
+ 11    SELECT COUNT(codePermanent)
+ 12    INTO nbInscrits
+ 13    FROM inscription
+ 14    WHERE sigle = lesigle AND nogroupe = lenogroupe AND codesession = lecodesession	AND dateabandon IS NULL;
+ 15    Return nbInscrits;
+ 16  END;
+ 17  /
+
+Function created.
+
+SQL> 
+SQL> SELECT fNbInscriptions('INF1110',20,32003) FROM DUAL
+  2  /
+
+FNBINSCRIPTIONS('INF1110',20,32003)                                             
+-----------------------------------                                             
+                                  4                                             
+
+SQL> 
+SQL> --UPDATE de la colonne nbInscriptions
+SQL> 
+SQL> DECLARE
+  2    cursor groupe_cur
+  3    IS
+  4    SELECT sigle, noGroupe, codeSession
+  5    FROM groupeCours;
+  6    groupe_rec groupe_cur%rowtype;
+  7  
+  8  BEGIN
+  9  	     OPEN groupe_cur;
+ 10  	     LOOP
+ 11  		     FETCH groupe_cur INTO groupe_rec;
+ 12  		     EXIT WHEN groupe_cur%NOTFOUND;
+ 13  		     UPDATE groupecours
+ 14  		     SET nbinscriptions = fnbinscriptions(groupe_rec.sigle, groupe_rec.nogroupe, groupe_rec.codesession)
+ 15  		     WHERE sigle = groupe_rec.sigle and nogroupe = groupe_rec.nogroupe and codesession = groupe_rec.codesession;
+ 16  	     END LOOP;
+ 17  	     CLOSE groupe_cur;
+ 18  END;
+ 19  /
+
+PL/SQL procedure successfully completed.
+
+SQL> 
+SQL> SELECT * FROM GroupeCours
+  2  /
+
+SIGLE     NOGROUPE CODESESSION MAXINSCRIPTIONS CODEP NBINSCRIPTIONS             
+------- ---------- ----------- --------------- ----- --------------             
+INF1110         20       32003             100 TREJ4              4             
+INF1110         30       32003             100 PASB1              1             
+INF1130         10       32003             100 PASB1              2             
+INF1130         30       32003             100 GALE9              1             
+INF2110         10       32003             100 TREJ4              0             
+INF3123         20       32003              50 GOLA1              0             
+INF3123         30       32003              50 GOLA1              0             
+INF3180         30       32003              50 DEVL2              2             
+INF3180         40       32003              50 DEVL2              2             
+INF5180         10       32003              50 KNUD1              0             
+INF5180         40       32003              50 KNUD1              0             
+
+SIGLE     NOGROUPE CODESESSION MAXINSCRIPTIONS CODEP NBINSCRIPTIONS             
+------- ---------- ----------- --------------- ----- --------------             
+INF1110         20       12004             100 TREJ4              0             
+INF1110         30       12004             100 TREJ4              0             
+INF2110         10       12004             100 PASB1              2             
+INF2110         40       12004             100 PASB1              2             
+INF3123         20       12004              50 GOLA1              0             
+INF3123         30       12004              50 GOLA1              0             
+INF3180         10       12004              50 DEVL2              1             
+INF3180         30       12004              50 DEVL2              0             
+INF5180         10       12004              50 DEVL2              2             
+INF5180         40       12004              50 GALE9              1             
+
+21 rows selected.
+
+SQL> 
+SQL> 
+SQL> 
+SQL> --------------------
+SQL> --   QUESTION 4   --
+SQL> --------------------
+SQL> 
+SQL> CREATE OR REPLACE PROCEDURE pTacheEnseignement(
+  2  	 code professeur.codeProfesseur%TYPE)
+  3  IS
+  4    unnom professeur.nom%TYPE;
+  5    unprenom professeur.prenom%TYPE;
+  6    uncode professeur.codeprofesseur%TYPE;
+  7  	 CURSOR infoCours
+  8    IS
+  9  	 SELECT sigle,
+ 10  	   nogroupe,
+ 11  	   codesession
+ 12  	 FROM groupecours
+ 13  	 natural JOIN professeur
+ 14  	 WHERE codeProfesseur = code;
+ 15    TYPE prof_cur
+ 16  IS
+ 17    record
+ 18    (
+ 19  	 lesigle groupeCours.sigle%TYPE,
+ 20  	 lenogroupe groupeCours.nogroupe%TYPE,
+ 21  	 lasession groupecours.codesession%TYPE);
+ 22    prof_rec prof_cur;
+ 23  
+ 24  BEGIN
+ 25    SELECT nom,
+ 26  	 prenom
+ 27    INTO unnom,
+ 28  	 unprenom
+ 29    FROM professeur
+ 30    WHERE codeProfesseur = code;
+ 31    DBMS_OUTPUT.PUT_LINE('code professeur:' || code);
+ 32    DBMS_OUTPUT.PUT_LINE('nom:' || unnom);
+ 33    DBMS_OUTPUT.PUT_LINE('prenom:' || unprenom);
+ 34  
+ 35    DBMS_OUTPUT.PUT_LINE(RPAD('sigle', 8) || RPAD('noGroupe', 10) || RPAD('session', 10));
+ 36  	 OPEN infoCours;
+ 37    LOOP
+ 38  	 FETCH infoCours INTO prof_rec;
+ 39  	 EXIT
+ 40    WHEN infoCours%NOTFOUND;
+ 41  	 DBMS_OUTPUT.PUT_LINE(RPAD(prof_rec.lesigle, 15) || RPAD(prof_rec.lenogroupe, 10) || RPAD(prof_rec.lasession, 20));
+ 42    END LOOP;
+ 43    CLOSE infoCours;
+ 44  EXCEPTION
+ 45  WHEN NO_DATA_FOUND THEN
+ 46    DBMS_OUTPUT.PUT_LINE('Professeur non trouvee');
+ 47  END;
+ 48  /
+
+Procedure created.
+
+SQL> 
+SQL> EXECUTE pTacheEnseignement('TREJ4');
+code professeur:TREJ4                                                           
+nom:Tremblay                                                                    
+prenom:Jean                                                                     
+sigle   noGroupe  session                                                       
+INF1110        20        32003                                                  
+INF2110        10        32003                                                  
+INF1110        20        12004                                                  
+INF1110        30        12004                                                  
+
+PL/SQL procedure successfully completed.
+
+SQL> /
+
+Procedure created.
+
+SQL> 
+SQL> 
+SQL> --------------------
+SQL> --   QUESTION 5   --
+SQL> --------------------
+SQL> CREATE OR REPLACE TRIGGER MAJnbInscription
+  2  AFTER INSERT ON INSCRIPTION
+  3  FOR EACH ROW
+  4  BEGIN
+  5  	     UPDATE GroupeCours
+  6  	     SET nbInscriptions = nbInscriptions + 1
+  7  	     WHERE sigle = :NEW.sigle AND noGroupe = :NEW.noGroupe AND codeSession = :NEW.codeSession;
+  8  END;
+  9  /
+
+Trigger created.
+
+SQL> 
+SQL> INSERT INTO Inscription
+  2  VALUES('TREY09087501','INF5180',10,12004, '19/12/2003',null,80)
+  3  /
+
+1 row created.
+
+SQL> 
+SQL> SELECT * FROM GroupeCours
+  2  WHERE sigle = 'INF5180' AND noGroupe = 10 AND codeSession = 12004
+  3  /
+
+SIGLE     NOGROUPE CODESESSION MAXINSCRIPTIONS CODEP NBINSCRIPTIONS             
+------- ---------- ----------- --------------- ----- --------------             
+INF5180         10       12004              50 DEVL2              3             
+
+SQL> 
+SQL> ROLLBACK
+  2  /
+
+Rollback complete.
+
+SQL> 
+SQL> 
+SQL> --------------------
+SQL> --   QUESTION 6   --
+SQL> --------------------
+SQL> 
+SQL> CREATE OR REPLACE VIEW MoyenneParGroupe (SIGLE, NOGROUPE, CODESESSION, MOYENNENOTE)
+  2  AS SELECT sigle, noGroupe, codeSession, AVG(note)
+  3  FROM Inscription
+  4  GROUP BY sigle, noGroupe, codeSession
+  5  /
+
+View created.
+
+SQL> 
+SQL> SELECT * FROM MoyenneParGroupe
+  2  /
+
+SIGLE     NOGROUPE CODESESSION MOYENNENOTE                                      
+------- ---------- ----------- -----------                                      
+INF1130         10       32003          80                                      
+INF5180         10       12004          85                                      
+INF1110         30       32003          90                                      
+INF5180         40       12004          80                                      
+INF1110         20       32003        77,5                                      
+INF1130         30       32003          80                                      
+INF2110         40       12004          80                                      
+INF3180         30       32003          75                                      
+INF3180         40       32003          75                                      
+INF2110         10       12004          85                                      
+INF3180         10       12004          90                                      
+
+11 rows selected.
+
+SQL> 
+SQL> CREATE OR REPLACE
+  2  TRIGGER InsteadUpdateMoyenneParGroupe
+  3  INSTEAD OF UPDATE ON MoyenneParGroupe
+  4  FOR EACH ROW
+  5  DECLARE
+  6  	     nbNotes Inscription.note%TYPE;
+  7  	     vieuTotal MoyenneParGroupe.moyenneNote%TYPE;
+  8  	     nouvTotal MoyenneParGroupe.moyenneNote%TYPE;
+  9  	     dif NUMBER;
+ 10  
+ 11  BEGIN
+ 12  	     SELECT COUNT(note) INTO nbNotes FROM inscription WHERE :OLD.sigle = :NEW.sigle AND :OLD.noGroupe = :NEW.noGroupe AND :OLD.codeSession = :NEW.codeSession;
+ 13  	     vieuTotal := :OLD.moyenneNote * nbNotes;
+ 14  	     nouvTotal := :NEW.moyenneNote * nbNotes;
+ 15  	     dif := (nouvTotal - vieuTotal)/nbNotes;
+ 16  	     UPDATE Inscription
+ 17  	     SET note = note + dif
+ 18  	     WHERE :OLD.sigle = :NEW.sigle AND :OLD.noGroupe = :NEW.noGroupe AND :OLD.codeSession = :NEW.codeSession;
+ 19  
+ 20  END;
+ 21  /
+
+Trigger created.
+
+SQL> 
+SQL> UPDATE MoyenneParGroupe
+  2  SET moyenneNote = 70
+  3  WHERE sigle = 'INF1130'AND noGroupe = 10 AND codeSession = 32003
+  4  /
+
+1 row updated.
+
+SQL> 
+SQL> SELECT * FROM MoyenneParGroupe
+  2  WHERE sigle = 'INF1130'AND noGroupe = 10 AND codeSession = 32003
+  3  /
+
+SIGLE     NOGROUPE CODESESSION MOYENNENOTE                                      
+------- ---------- ----------- -----------                                      
+INF1130         10       32003          70                                      
+
+SQL> 
+SQL> SELECT * FROM Inscription
+  2  WHERE sigle = 'INF1130'AND noGroupe = 10 AND codeSession = 32003
+  3  /
+
+CODEPERMANEN SIGLE     NOGROUPE CODESESSION DATEINSCRI DATEABANDO       NOTE    
+------------ ------- ---------- ----------- ---------- ---------- ----------    
+TREJ18088001 INF1130         10       32003 16/08/2003                    60    
+MARA25087501 INF1130         10       32003 22/08/2003                    80    
+
+SQL> 
+SQL> SPOOL OFF
